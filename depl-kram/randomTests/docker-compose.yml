@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build: ../../frontend
+    ports:
+      - "2067:80"
+    environment:
+      IDENTITY_URL: ${IDENTITY_URL:-}
+      AGGREGATOR_URL: ${AGGREGATOR_URL:-}
+    depends_on:
+      - aggregator
+      - identidy
+    restart: unless-stopped

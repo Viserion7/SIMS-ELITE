@@ -1,0 +1,82 @@
+name: Build and Publish Docker Images
+
+on:
+  workflow_dispatch:
+  #release: # auskommentiert, weil dockerfiles daweil noch leer
+  #  types: [published] # On Realise ausgelöst dann
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  # ==========================================
+  # BUILD & PUSH
+  # ==========================================
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Lowercase repository name
+        id: repo_name
+        run: echo "lowercase_repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # Token Auto von Repo
+      # ==========================================
+      # FRONTEND
+      # ==========================================
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-frontend
+          tags: |
+            # immer vers nummer dazu
+            type=semver,pattern={{raw}}
+      - name: Build and push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+      
+      # ==========================================
+      # Aggregator
+      # ==========================================
+      - name: Extract metadata for aggregator
+        id: meta-aggregator
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-aggregator
+          tags: |
+            # immer vers nummer dazu
+            type=semver,pattern={{raw}}
+      - name: Build and push aggregator Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./sims-aggregator
+          file: ./sims-aggregator/Dockerfile
+          push: true
+          tags: ${{ steps.meta-aggregator.outputs.tags }}
+          labels: ${{ steps.meta-aggregator.outputs.labels }}
+
+      
+      # ==========================================
+      # To Do Weitere
+      # ==========================================
+
+     

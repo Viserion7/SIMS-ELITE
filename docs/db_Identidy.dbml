@@ -1,0 +1,54 @@
+// ==========================================
+// 1. HAUPTTABELLEN
+// ==========================================
+
+Table user {
+  id int [pk, increment]
+  email varchar [unique, not null]
+  password varchar [not null]
+  is_deleted boolean [default: false]
+}
+
+Table category {
+  id int [pk, increment]
+  name varchar [not null]
+  description text
+}
+
+// ==========================================
+// 2. REFERENZ-TABELLEN (LOW, MEDIUM, HIGH)
+// ==========================================
+
+Table low {
+  id int [pk, increment]
+  user_id int 
+  category_id int 
+}
+
+Table medium {
+  id int [pk, increment]
+  user_id int 
+  category_id int 
+}
+
+Table high {
+  id int [pk, increment]
+  user_id int 
+  category_id int 
+}
+
+// ==========================================
+// 3. BEZIEHUNGEN (M:N via Mapping-Tabellen)
+// ==========================================
+
+// Beziehungen für "low"
+Ref: low.user_id > user.id
+Ref: low.category_id > category.id
+
+// Beziehungen für "medium"
+Ref: medium.user_id > user.id
+Ref: medium.category_id > category.id
+
+// Beziehungen für "high"
+Ref: high.user_id > user.id
+Ref: high.category_id > category.id

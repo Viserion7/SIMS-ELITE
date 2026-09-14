@@ -1,0 +1,36 @@
+services:
+
+  dbIdentidy:
+    image: postgres:16
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${ID_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ID_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${ID_POSTGRES_DB}
+    volumes:
+      - ./dbIdentidy_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  dbAggregator:
+    image: postgres:16
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${AGGR_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${AGGR_POSTGRES_DB}
+    volumes:
+      - ./dbAggregator_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+

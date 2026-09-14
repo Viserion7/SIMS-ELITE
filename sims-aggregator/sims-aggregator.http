@@ -1,0 +1,6 @@
+@sims_aggregator_HostAddress = http://localhost:5078
+
+GET {{sims_aggregator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

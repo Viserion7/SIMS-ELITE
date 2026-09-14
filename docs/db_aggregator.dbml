@@ -1,0 +1,13 @@
+// ==========================================
+// MICROSERVICE 2: DATA RECORD
+// ==========================================
+
+Table data_record {
+  id uuid [pk] // Wird durch das externe System befüllt
+  created_at timestamp [default: `now()`] // Automatischer Zeitstempel
+  source_format varchar [not null]
+  type varchar [not null]
+  name varchar [not null]
+  desc text
+  specific_type varchar // Nullable (kein not null)
+}
