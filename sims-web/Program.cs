@@ -1,5 +1,6 @@
 
 namespace sims_web;
+using Scalar.AspNetCore;
 
 public class Program
 {
@@ -18,6 +19,8 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            //TO DO: nur im Def Scalar anzeigen Lassen!
+            app.MapScalarApiReference();
             app.MapOpenApi();
         }
 
