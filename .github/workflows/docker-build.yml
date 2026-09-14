@@ -2,7 +2,7 @@ name: Build and Publish Docker Images
 
 on:
   workflow_dispatch:
-  #release: # auskommentiert, weil dockerfiles daweil noch lehr
+  #release: # auskommentiert, weil dockerfiles daweil noch leer
   #  types: [published] # On Realise ausgelöst dann
 
 env:
@@ -57,22 +57,22 @@ jobs:
       # ==========================================
       # Aggregator
       # ==========================================
-      - name: Extract metadata for Backend
-        id: meta-backend
+      - name: Extract metadata for aggregator
+        id: meta-aggregator
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-backend
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-aggregator
           tags: |
             # immer vers nummer dazu
             type=semver,pattern={{raw}}
-      - name: Build and push Backend Image
+      - name: Build and push aggregator Image
         uses: docker/build-push-action@v5
         with:
           context: ./sims-aggregator
           file: ./sims-aggregator/Dockerfile
           push: true
-          tags: ${{ steps.meta-backend.outputs.tags }}
-          labels: ${{ steps.meta-backend.outputs.labels }}
+          tags: ${{ steps.meta-aggregator.outputs.tags }}
+          labels: ${{ steps.meta-aggregator.outputs.labels }}
 
       
       # ==========================================
