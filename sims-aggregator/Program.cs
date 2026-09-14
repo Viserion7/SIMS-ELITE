@@ -1,5 +1,6 @@
 
 namespace sims_aggregator;
+using Scalar.AspNetCore;
 
 public class Program
 {
@@ -18,6 +19,8 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            //To Do: Scalar nur in Dev
+            app.MapScalarApiReference();
             app.MapOpenApi();
         }
 
