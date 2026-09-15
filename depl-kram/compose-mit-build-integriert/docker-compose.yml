@@ -27,6 +27,17 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  sims-stix-ingest:
+    image: ../../sims-stix-ingest
+    ports:
+      - "8080:8080"
+    environment:
+      - MongoDbSettings__ConnectionString=mongodb://${STIX_MONGO_USER}:${STIX_MONGO_PASSWORD}@dbstix:27017/?authSource=admin
+    depends_on:
+      dbstix:
+        condition: service_healthy
+    restart: unless-stopped
+
   dbidentity:
     image: postgres:16
     ports:
@@ -43,6 +54,7 @@ services:
       timeout: 5s
       retries: 10
     restart: unless-stopped
+  
   dbAggregator:
     image: postgres:16
     ports:
@@ -60,3 +72,19 @@ services:
       retries: 10
     restart: unless-stopped
 
+  dbstix:
+    image: mongo:8.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${STIX_MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${STIX_MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${STIX_MONGO_DB}
+    volumes:
+      - ./dbstix_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
