@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="sims-aggregator/sims-aggregator.csproj" />
-  <Project Path="sims-identidy/sims-identidy.csproj" />
+  <Project Path="sims-identity/sims-identity.csproj" />
 </Solution>

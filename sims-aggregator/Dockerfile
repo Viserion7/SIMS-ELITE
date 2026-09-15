@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["sims-aggregator/sims-aggregator.csproj", "sims-aggregator/"]
-RUN dotnet restore "./sims-aggregator/sims-aggregator.csproj"
+COPY ["sims-aggregator.csproj", "./"]
+RUN dotnet restore "./sims-aggregator.csproj"
+
 COPY . .
-WORKDIR "/src/sims-aggregator"
 RUN dotnet build "./sims-aggregator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
