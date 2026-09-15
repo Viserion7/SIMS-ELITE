@@ -1,0 +1,6 @@
+@sims_stix_ingest_HostAddress = http://localhost:5174
+
+GET {{sims_stix_ingest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
