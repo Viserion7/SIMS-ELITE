@@ -19,7 +19,6 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            //To Do: Scalar nur in Dev
             app.MapScalarApiReference();
             app.MapOpenApi();
         }
