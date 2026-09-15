@@ -8,5 +8,5 @@ services:
       AGGREGATOR_URL: ${AGGREGATOR_URL:-}
     depends_on:
       - aggregator
-      - identidy
+      - identity
     restart: unless-stopped

@@ -8,7 +8,7 @@ services:
       AGGREGATOR_URL: ${AGGREGATOR_URL:-}
     depends_on:
       - aggregator
-      - identidy
+      - identity
     restart: unless-stopped
 
   aggregator:
@@ -20,14 +20,14 @@ services:
     expose:
       - "3033"
 
-  identidy:
-    build: ../../sims-identidy
+  identity:
+    build: ../../sims-identity
     depends_on:
-      dbIdentidy:
+      dbidentity:
         condition: service_healthy
     restart: unless-stopped
 
-  dbIdentidy:
+  dbidentity:
     image: postgres:16
     ports:
       - "5433:5432"
@@ -36,7 +36,7 @@ services:
       POSTGRES_PASSWORD: ${ID_POSTGRES_PASSWORD}
       POSTGRES_DB: ${ID_POSTGRES_DB}
     volumes:
-      - ./dbIdentidy_data:/var/lib/postgresql/data
+      - ./dbidentity_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 5s

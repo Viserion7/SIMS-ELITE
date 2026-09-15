@@ -1,5 +1,5 @@
 # Custom Ignores
-**/dbIdentidy_data/
+**/dbidentity_data/
 **/dbAggregator_data/
 **/deptrack-apiserver-data/
 **/dbDeptrack-data/
