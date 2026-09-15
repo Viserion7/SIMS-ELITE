@@ -1,0 +1,44 @@
+name: Dependency-Track
+# Ordner Vorher selber ertsellen sonst Berechtigungen Probleme!
+services:
+  apiserver:
+    image: ghcr.io/dependencytrack/apiserver:5.1.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+    environment:
+      DT_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/dtrack"
+      DT_DATASOURCE_USERNAME: ${DEP_POSTGRES_USER}
+      DT_DATASOURCE_PASSWORD: ${DEP_POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:6780:8080"
+    volumes:
+      - "./deptrack-apiserver-data:/data"
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/dependencytrack/frontend:5.1.0
+    environment:
+      API_BASE_URL: ${API_BASE_URL}
+    ports:
+      - "127.0.0.1:6781:8080"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DEP_POSTGRES_DB}
+      POSTGRES_USER: ${DEP_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DEP_POSTGRES_PASSWORD}
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - "./dbDeptrack-data:/var/lib/postgresql"

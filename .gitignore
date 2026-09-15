@@ -1,7 +1,10 @@
 # Custom Ignores
 **/dbIdentidy_data/
 **/dbAggregator_data/
+**/deptrack-apiserver-data/
+**/dbDeptrack-data/
 
+depl-kram/sonstigeContainer/signoz/depl/pours
 
 
 
