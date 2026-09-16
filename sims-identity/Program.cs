@@ -5,11 +5,12 @@ using Scalar.AspNetCore;
 using Microsoft.Extensions.Logging;
 
 using sims_identity.Extensions;
+using sims_identity.Data;
 
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,15 @@ public class Program
 
         var app = builder.Build();
 
+        //ai Magie 2h selber Probiert ich verstehe es nicht :(
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
 
+            Seeder LokalSeeder = new Seeder(context);
+            await LokalSeeder.AddCategories();
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
