@@ -21,8 +21,11 @@ public class Program
 
         builder.Logging.AddConsole();
         builder.AddOtel("sims-identity");
+        builder.AddEf();
 
         var app = builder.Build();
+
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
