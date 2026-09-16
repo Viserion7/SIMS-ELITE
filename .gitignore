@@ -4,6 +4,7 @@
 **/deptrack-apiserver-data/
 **/dbDeptrack-data/
 **/dbstix_data/
+**/.vscode/
 
 depl-kram/sonstigeContainer/signoz/depl/pours
 
