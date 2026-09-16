@@ -9,7 +9,9 @@
 depl-kram/sonstigeContainer/signoz/depl/pours
 
 
-
+sims-identity/Migrations
+# macht das sinn?
+sims-identity/appsettings.Development.json
 
 
 # Ignore Visual Studio temporary files, build results, and

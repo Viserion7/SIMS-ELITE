@@ -1,0 +1,350 @@
+namespace sims_identity.Data;
+
+
+
+public class Seeder
+{
+    private ApplicationDbContext context { get; set; }
+    public Seeder(ApplicationDbContext contextInp)
+    {
+        context = contextInp;
+
+    }
+    public async Task AddCategories()
+    {
+
+        try
+        {
+            await context.Database.EnsureCreatedAsync();
+
+            List<Level> levels = new List<Level>
+            {
+                new Level{
+                name = "Low"
+                },
+                new Level{
+                name = "Medium"
+                },
+                new Level{
+                name = "High"
+                },
+            };
+
+            foreach (Level item in levels)
+            {
+                Level? bestehendesItem = context.Level
+                .FirstOrDefault(inDbSchonExestierend => inDbSchonExestierend.name == item.name);
+                if (bestehendesItem == null)
+                {
+                    context.Level.Add(item);
+                }
+                else
+                {
+                    bestehendesItem.name = item.name;
+                }
+
+            }
+
+            await context.SaveChangesAsync();
+
+
+
+            int lowLevel = context.Level.First(level => level.name == "Low").id;
+            int mediumLevel = context.Level.First(level => level.name == "Medium").id;
+            int highLevel = context.Level.First(level => level.name == "High").id;
+
+
+
+            List<Category> categories = new List<Category>
+                {
+                    // STIX Domain Objects
+                    new Category
+                    {
+                        name = "attack-pattern",
+                        description = "STIX beschreibt, wie ein Angriff ausgeführt wird.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "campaign",
+                        description = "STIX beschreibt eine zusammengehörige Angriffskampagne.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "course-of-action",
+                        description = "STIX beschreibt eine empfohlene Gegenmaßnahme.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "grouping",
+                        description = "STIX gruppiert zusammengehörige Objekte.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "identity",
+                        description = "STIX beschreibt eine Person, Organisation oder ein System.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "incident",
+                        description = "STIX beschreibt einen Sicherheitsvorfall.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "indicator",
+                        description = "STIX beschreibt ein Muster zur Erkennung möglicher Bedrohungen.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "infrastructure",
+                        description = "STIX beschreibt technische Infrastruktur einer Bedrohung.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "intrusion-set",
+                        description = "STIX beschreibt eine Gruppe oder Sammlung von Angriffen.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "location",
+                        description = "STIX beschreibt einen geografischen Ort.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "malware",
+                        description = "STIX beschreibt Schadsoftware.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "malware-analysis",
+                        description = "STIX beschreibt die Analyse von Schadsoftware.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "note",
+                        description = "STIX speichert zusätzliche Notizen zu anderen Objekten.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "observed-data",
+                        description = "STIX beschreibt beobachtete Daten aus einem Netzwerk oder System.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "opinion",
+                        description = "STIX beschreibt eine Bewertung oder Einschätzung.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "report",
+                        description = "STIX fasst Informationen zu einer Bedrohung zusammen.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "threat-actor",
+                        description = "STIX beschreibt einen Angreifer oder eine Angreifergruppe.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "tool",
+                        description = "STIX beschreibt ein Werkzeug, das bei Angriffen verwendet wird.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "vulnerability",
+                        description = "STIX beschreibt eine Schwachstelle in einem System.",
+                        LevelId = lowLevel
+                    },
+
+                    // STIX Cyber-observable Objects
+                    new Category
+                    {
+                        name = "artifact",
+                        description = "STIX beschreibt beliebige Binärdaten oder Dateien.",
+                        LevelId = highLevel
+                    },
+                    new Category
+                    {
+                        name = "autonomous-system",
+                        description = "STIX beschreibt ein autonomes Netzwerk-System.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "directory",
+                        description = "STIX beschreibt ein Verzeichnis im Dateisystem.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "domain-name",
+                        description = "STIX beschreibt einen Domainnamen.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "email-addr",
+                        description = "STIX beschreibt eine E-Mail-Adresse.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "email-message",
+                        description = "STIX beschreibt eine E-Mail-Nachricht.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "file",
+                        description = "STIX beschreibt eine Datei.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "ipv4-addr",
+                        description = "STIX beschreibt eine IPv4-Adresse.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "ipv6-addr",
+                        description = "STIX beschreibt eine IPv6-Adresse.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "mac-addr",
+                        description = "STIX beschreibt eine MAC-Adresse.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "mutex",
+                        description = "STIX beschreibt ein Mutex-Objekt.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "network-traffic",
+                        description = "STIX beschreibt Netzwerkverkehr.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "process",
+                        description = "STIX beschreibt einen laufenden Prozess.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "software",
+                        description = "STIX beschreibt Software oder ein Betriebssystem.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "url",
+                        description = "STIX beschreibt eine URL.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "user-account",
+                        description = "STIX beschreibt ein Benutzerkonto.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "windows-registry-key",
+                        description = "STIX beschreibt einen Windows-Registrierungsschlüssel.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "x509-certificate",
+                        description = "STIX beschreibt ein X.509-Zertifikat.",
+                        LevelId = lowLevel
+                    },
+
+                    // STIX Relationship Objects
+                    new Category
+                    {
+                        name = "relationship",
+                        description = "STIX beschreibt eine Beziehung zwischen zwei Objekten.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "sighting",
+                        description = "STIX beschreibt das Beobachten eines Objekts.",
+                        LevelId = lowLevel
+                    },
+
+                    // STIX Meta Objects
+                    new Category
+                    {
+                        name = "language-content",
+                        description = "STIX enthält Übersetzungen und sprachabhängige Inhalte.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "marking-definition",
+                        description = "STIX beschreibt Kennzeichnungen und Zugriffsbeschränkungen.",
+                        LevelId = lowLevel
+                    },
+                    new Category
+                    {
+                        name = "extension-definition",
+                        description = "STIX beschreibt eine Erweiterung des STIX-Datenmodells.",
+                        LevelId = lowLevel
+                    }
+                };
+
+            foreach (Category item in categories)
+            {
+                Category? bestehendesItem = context.Category
+                .FirstOrDefault(inDbSchonExestierend => inDbSchonExestierend.name == item.name);
+                if (bestehendesItem == null)
+                {
+                    context.Category.Add(item);
+                }
+                else
+                {
+                    bestehendesItem.description = item.description;
+                    bestehendesItem.LevelId = item.LevelId;
+                }
+
+            }
+
+
+            await context.SaveChangesAsync();
+
+        }
+        catch (System.Exception)
+        {
+
+            throw;
+        }
+
+
+    }
+
+}

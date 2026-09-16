@@ -4,10 +4,15 @@
 
 Table data_record {
   id uuid [pk] // Wird durch das externe System befüllt
-  created_at timestamp [default: `now()`] // Automatischer Zeitstempel
+  eid varchar // Extra Entity-ID des Eintrags selbst (für spätere Relationen)
+  
+  created_at timestamp // Wird aktiv von euch übergeben, kein automatischer DB-Default mehr
+  db_created_at timestamp [default: `now()`] // Neuer automatischer Zeitstempel für den DB-Eintrag
+  
   source_format varchar [not null]
   type varchar [not null]
   name varchar [not null]
-  desc text
-  specific_type varchar // Nullable (kein not null)
+  desc text  
+  is_deleted boolean [default: false] // Für Soft-Deletes
+  deleted_by uuid // Nullable. Speichert, wer den Eintrag gelöscht hat.
 }

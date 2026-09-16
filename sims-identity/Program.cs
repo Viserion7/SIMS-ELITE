@@ -3,16 +3,16 @@ namespace sims_identity;
 
 using Scalar.AspNetCore;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+
+using sims_identity.Extensions;
+using sims_identity.Data;
+
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
 
@@ -20,54 +20,21 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
-        string serviceName = "sims-identity";
-        IConfigurationSection otlpEndpoint = builder.Configuration.GetSection("OTEL_EXPORTER_OTLP_ENDPOINT");
-        string? endpointUrl = otlpEndpoint["url"];
-        string? endpointKey = otlpEndpoint["key"];
-
         builder.Logging.AddConsole();
-        if (!string.IsNullOrEmpty(endpointUrl))
-        {
-            //tracing
-            builder.Services.AddOpenTelemetry()
-                .WithTracing(tpb =>
-                {
-                    tpb.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
-                       .AddAspNetCoreInstrumentation()
-                       .AddHttpClientInstrumentation()
-                       .AddOtlpExporter(otlp =>
-                       {
-                           otlp.Endpoint = new Uri(endpointUrl);
-                           if (!string.IsNullOrEmpty(endpointKey))
-                           {
-                               otlp.Headers = "signoz-ingestion-key=" + endpointKey;
-                           }
-                       });
-                });
-
-
-
-            //logging
-            builder.Logging.AddOpenTelemetry(opt =>
-            {
-                opt.IncludeFormattedMessage = true;
-                opt.IncludeScopes = true;
-                opt.ParseStateValues = true;
-                opt.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName));
-                opt.AddOtlpExporter(otlp =>
-                {
-                    otlp.Endpoint = new Uri(endpointUrl);
-                    if (!string.IsNullOrEmpty(endpointKey))
-                    {
-                        otlp.Headers = "signoz-ingestion-key=" + endpointKey;
-                    }
-
-                });
-            });
-
-        }
+        builder.AddOtel("sims-identity");
+        builder.AddEf();
 
         var app = builder.Build();
+
+        //ai Magie 2h selber Probiert ich verstehe es nicht :(
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider
+                .GetRequiredService<ApplicationDbContext>();
+
+            Seeder LokalSeeder = new Seeder(context);
+            await LokalSeeder.AddCategories();
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

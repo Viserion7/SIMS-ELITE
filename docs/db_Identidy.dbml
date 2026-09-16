@@ -1,54 +1,41 @@
 // ==========================================
 // 1. HAUPTTABELLEN
 // ==========================================
-
 Table user {
   id int [pk, increment]
   email varchar [unique, not null]
-  password varchar [not null]
+  password_hash varchar [not null]
   is_deleted boolean [default: false]
+}
+
+Table level {
+  id int [pk, increment]
+  name varchar [unique, not null] // z.B. "low", "medium", "high" oder "beta-tester"
+  // description wurde hier entfernt
 }
 
 Table category {
   id int [pk, increment]
   name varchar [not null]
-  description text
+  description text                // <-- Hier ist die Beschreibung (neu hinzugefügt)
+  level_id int [not null]         // Jede Kategorie gehört zu genau einem Level/Paket
 }
 
 // ==========================================
-// 2. REFERENZ-TABELLEN (LOW, MEDIUM, HIGH)
+// 2. M:N TABELLE (User <-> Level)
 // ==========================================
-
-Table low {
-  id int [pk, increment]
-  user_id int 
-  category_id int 
-}
-
-Table medium {
-  id int [pk, increment]
-  user_id int 
-  category_id int 
-}
-
-Table high {
-  id int [pk, increment]
-  user_id int 
-  category_id int 
+Table user_level {
+  user_id int [not null]
+  level_id int [not null]
+  
+  indexes {
+    (user_id, level_id) [unique, note: 'Ein User kann jedes Level nur 1x besitzen']
+  }
 }
 
 // ==========================================
-// 3. BEZIEHUNGEN (M:N via Mapping-Tabellen)
+// 3. BEZIEHUNGEN
 // ==========================================
-
-// Beziehungen für "low"
-Ref: low.user_id > user.id
-Ref: low.category_id > category.id
-
-// Beziehungen für "medium"
-Ref: medium.user_id > user.id
-Ref: medium.category_id > category.id
-
-// Beziehungen für "high"
-Ref: high.user_id > user.id
-Ref: high.category_id > category.id
+Ref: user_level.user_id > user.id
+Ref: user_level.level_id > level.id
+Ref: category.level_id > level.id
