@@ -2,6 +2,7 @@
 namespace sims_aggregator;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Scalar.AspNetCore;
 using sims_aggregator.Data;
 
@@ -14,15 +15,27 @@ public class Program
         // setup openTelemetry
         var serviceName_openTelemetry = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME") ?? "sims-aggregator";
         var endpoint_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
-        
+
+        builder.Services.AddOpenTelemetry() // setup OpenTelemetry tracing
+        .WithTracing(tpb =>
+        {
+            tpb.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName_openTelemetry)) // Service name used in dashboard
+               .AddAspNetCoreInstrumentation() // Auto-instrument ASP.NET Core middleware
+               .AddHttpClientInstrumentation() // Auto-instrument HTTP client requests
+               .AddOtlpExporter(otlp =>
+               {
+                   otlp.Endpoint = new Uri(endpoint_opentelemetry); // Replace with SigNoz OTLP endpoint
+               });
+        });
+
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole(); // see Logs also in the Console
-        builder.Logging.AddOpenTelemetry(opt =>
+        builder.Logging.AddOpenTelemetry(opt => // setup OpenTelemetry logging
         {
             opt.IncludeFormattedMessage = true; // Include the formatted log message
             opt.IncludeScopes = true; // Include scope information
             opt.ParseStateValues = true; // Enable structured log parsing
-            opt.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName_openTelemetry)); // Match the trace service name
+            opt.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName_openTelemetry));
             opt.AddOtlpExporter(otlp =>
             {
                 otlp.Endpoint = new Uri(endpoint_opentelemetry);

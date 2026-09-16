@@ -27,7 +27,7 @@ namespace sims_aggregator.Controllers
 
             if (incident == null)
             {
-                this.logger.LogWarning($"Incident with ID {id} not found.");
+                this.logger.LogWarning("Incident with ID {IncidentId} not found.", id);
                 return NotFound("Incident was not found.");
             }
 
