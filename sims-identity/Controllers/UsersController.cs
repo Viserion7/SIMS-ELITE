@@ -1,11 +1,11 @@
 //inspiration: https://medium.com/@aschultzme/introduction-to-entity-framework-building-a-simple-crud-api-in-net-b22eb2efbe6e
 using Microsoft.AspNetCore.Mvc;
+using sims_identity.Dtos;
 
 namespace sims_identity.Controllers;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 using sims_identity.Data;
 
 
