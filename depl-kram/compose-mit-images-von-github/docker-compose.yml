@@ -13,6 +13,9 @@ services:
 
   aggregator:
     image: ghcr.io/viserion7/sims-elite-aggregator:latest
+    environment:
+      OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${AGGR_OTEL_EXPORTER_OTLP_ENDPOINT:-}
     depends_on:
       dbAggregator:
         condition: service_healthy
