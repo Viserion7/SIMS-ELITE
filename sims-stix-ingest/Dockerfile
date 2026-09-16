@@ -7,10 +7,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["sims-stix-ingest/sims-stix-ingest.csproj", "sims-stix-ingest/"]
-RUN dotnet restore "sims-stix-ingest/sims-stix-ingest.csproj"
+COPY ["sims-stix-ingest.csproj", "./"]
+RUN dotnet restore "./sims-stix-ingest.csproj"
+
 COPY . .
-WORKDIR "/src/sims-stix-ingest"
 RUN dotnet build "./sims-stix-ingest.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
