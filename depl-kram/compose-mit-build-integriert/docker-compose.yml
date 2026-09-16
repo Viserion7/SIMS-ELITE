@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   sims-stix-ingest:
-    image: ../../sims-stix-ingest
+    build: ../../sims-stix-ingest
     ports:
       - "8080:8080"
     environment:
