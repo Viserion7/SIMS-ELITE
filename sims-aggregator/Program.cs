@@ -51,6 +51,13 @@ public class Program
 
         var app = builder.Build(); // Web app erstellen
 
+        // Erstellt automatisch alle fehlenden Tabellen in Postgres!
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IncidentContext>();
+            db.Database.EnsureCreated();
+        }
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment()) // wenn in Entwiklungsumgebung aktiviere Scalar helper
         {
