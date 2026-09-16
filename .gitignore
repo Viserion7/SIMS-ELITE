@@ -3,6 +3,7 @@
 **/dbAggregator_data/
 **/deptrack-apiserver-data/
 **/dbDeptrack-data/
+**/dbstix_data/
 
 depl-kram/sonstigeContainer/signoz/depl/pours
 
