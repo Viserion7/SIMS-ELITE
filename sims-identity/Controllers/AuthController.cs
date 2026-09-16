@@ -24,6 +24,7 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("login")]
+    [EndpointDescription("Meldet einen Benutzer an.")]
     public async Task<ActionResult<User>> LoginUser(CreateUserDto user)
     {
         User? bestehendesItem = _context.User
@@ -49,18 +50,21 @@ public class AuthController : ControllerBase
 
 
     [HttpGet("me")]
+    [EndpointDescription("Gibt den aktuell angemeldeten Benutzer zurück.")]
     public async Task<ActionResult<TokenDto>> GetMe(TokenDto token)
     {
         return token; // To Do Implement me
     }
 
     [HttpPost("refresh")]
+    [EndpointDescription("Erstellt ein neues Zugriffstoken.")]
     public async Task<ActionResult<TokenDto>> RefreshMe(TokenDto token)
     {
         return token; // To Do Implement me
     }
 
     [HttpPost("logout")]
+    [EndpointDescription("Meldet den Benutzer ab.")]
     public async Task<ActionResult<TokenDto>> LogoutMe(TokenDto token)
     {
         return token; // To Do Implement me

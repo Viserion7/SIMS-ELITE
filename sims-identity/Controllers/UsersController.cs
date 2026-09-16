@@ -24,6 +24,7 @@ public class UserController : ControllerBase
 
 
     [HttpPost]
+    [EndpointDescription("Legt einen neuen Benutzer an.")]
     public async Task<ActionResult<CreateUserDto>> CreateUser(CreateUserDto incommingUser)
     {
         User user = new User
@@ -42,6 +43,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [EndpointDescription("Gibt die Daten eines Benutzers zurück. Wenn kein Benutzer mit dieser ID existiert, wird 404 zurückgegeben.")]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {
         var user = await _context.User.
@@ -60,6 +62,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [EndpointDescription("Gibt alle Benutzer zurück.")]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         return await _context.User.ToArrayAsync();
@@ -67,6 +70,7 @@ public class UserController : ControllerBase
 
 
     [HttpPut("{id}")]
+    [EndpointDescription("Ändert die Daten eines Benutzers.")]
     public async Task<ActionResult> UpdateUser(int id, UpdateUserDto updatedUser)
     {
 
@@ -95,6 +99,7 @@ public class UserController : ControllerBase
 
 
     [HttpDelete("{id}")]
+    [EndpointDescription("Markiert einen Benutzer als gelöscht.")]
     public async Task<IActionResult> DeleteUser(int id)
     {
         var user = await _context.User.FindAsync(id);
@@ -115,6 +120,7 @@ public class UserController : ControllerBase
 
     }
     [HttpGet("{id}/details")]
+    [EndpointDescription("Gibt einen Benutzer mit seinen Levels und Kategorien zurück.")]
     public async Task<ActionResult<User>> GetDetails(int id)
     {
         var user = await _context.User

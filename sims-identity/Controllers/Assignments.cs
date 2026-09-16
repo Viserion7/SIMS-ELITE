@@ -24,12 +24,14 @@ public class AssignmentController : ControllerBase
 
 
     [HttpPost("user/{id}/level")]
+    [EndpointDescription("Weist einem Benutzer ein Level zu.")]
     public async Task<ActionResult<User>> LevelUserZuweisen(int id)
     {
         return NoContent(); // to do
     }
 
     [HttpDelete("user/{id}/level/{levelid}")]
+    [EndpointDescription("Entfernt ein Level von einem Benutzer.")]
     public async Task<ActionResult<User>> LevelVonUserLoeschen(int id, int levelid)
     {
         return NoContent(); // to do

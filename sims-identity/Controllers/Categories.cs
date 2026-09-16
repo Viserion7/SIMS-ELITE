@@ -25,6 +25,7 @@ public class CategoriesController : ControllerBase
 
 
     [HttpGet("categories")]
+    [EndpointDescription("Gibt alle Kategorien zurück.")]
     public async Task<ActionResult<List<Category>>> GetAllCategories()
     {
         return _context.Category.ToList();
