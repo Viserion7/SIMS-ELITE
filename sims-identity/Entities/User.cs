@@ -6,4 +6,6 @@ public class User
     public string password_hash { get; set; }
 
     public bool is_deleted { get; set; }
+
+    public ICollection<Level> Levels { get; set; } = new List<Level>();
 }
