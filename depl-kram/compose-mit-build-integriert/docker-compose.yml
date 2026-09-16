@@ -13,15 +13,20 @@ services:
 
   aggregator:
     build: ../../sims-aggregator
+    ports:
+      - "88:8080"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-}
       OTEL_EXPORTER_OTLP_ENDPOINT: ${AGGR_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      POSTGRES_HOST: dbAggregator
+      POSTGRES_USER: ${AGGR_POSTGRES_USER:-}
+      POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD:-}
+      POSTGRES_DB: ${AGGR_POSTGRES_DB:-}
     depends_on:
       dbAggregator:
         condition: service_healthy
     restart: unless-stopped
-    expose:
-      - "3033"
 
   identity:
     build: ../../sims-identity
