@@ -5,7 +5,7 @@ namespace sims_identity.Controllers;
 using Microsoft.Extensions.Logging;
 
 [ApiController]
-[Route("[controller]")]
+[Route("basetemplate/[controller]")]
 public class WeatherForecastController : ControllerBase
 {
 
