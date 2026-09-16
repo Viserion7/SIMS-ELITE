@@ -10,20 +10,16 @@ using sims_identity.Data;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-public class UsersController : ControllerBase
+public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly ILogger<UsersController> _logger;
+    private readonly ILogger<UserController> _logger;
 
-    public UsersController(ApplicationDbContext context, ILogger<UsersController> logger)
+    public UserController(ApplicationDbContext context, ILogger<UserController> logger)
     {
         _context = context;
         _logger = logger;
     }
-
-
-
-
 
 
     [HttpPost]
@@ -54,7 +50,6 @@ public class UsersController : ControllerBase
     }
 
 
-    // PUT: api/Users/{id}
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateUser(int id, User updatedUser)
     {
