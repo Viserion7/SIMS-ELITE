@@ -28,11 +28,13 @@ services:
     restart: unless-stopped
 
   sims-stix-ingest:
-    image: ../../sims-stix-ingest
+    build: ../../sims-stix-ingest
     ports:
       - "8080:8080"
     environment:
       - MongoDbSettings__ConnectionString=mongodb://${STIX_MONGO_USER}:${STIX_MONGO_PASSWORD}@dbstix:27017/?authSource=admin
+      - MongoDbSettings__DatabaseName=stix_db
+      - MongoDbSettings__CollectionName=stix_bundles
     depends_on:
       dbstix:
         condition: service_healthy
