@@ -30,7 +30,6 @@ public static class EfExtensions
             {
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseNpgsql(dbString));
-
             }
             else
             {
