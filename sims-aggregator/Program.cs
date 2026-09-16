@@ -3,6 +3,7 @@ namespace sims_aggregator;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using Scalar.AspNetCore;
+using sims_aggregator.Data;
 
 public class Program
 {
@@ -28,15 +29,14 @@ public class Program
             });
         });
 
-
-
-        //TODO: das verstehen den Code da unten!
+        // HTTP aufsetzen
+        builder.Services.AddDbContext<IncidentContext>(); // damit in Controller auf DB Context zugreifen können
         // Add services to the container.
         builder.Services.AddControllers(); // In Controller/ gibt es Klassen das sind unsere ControllerKlassen
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi(); // ???
+        builder.Services.AddOpenApi(); // API Configs erstellen
 
-        var app = builder.Build(); // ???
+        var app = builder.Build(); // Web app erstellen
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment()) // wenn in Entwiklungsumgebung aktiviere Scalar helper
@@ -47,7 +47,7 @@ public class Program
 
         app.UseHttpsRedirection(); // http:// (302 fwd req)-> https://
 
-        app.UseAuthorization(); // middleware?? -> checkt ob user passt
+        app.UseAuthorization(); // middleware -> checkt ob user passt
 
         app.MapControllers(); // aktiviert routing
 
