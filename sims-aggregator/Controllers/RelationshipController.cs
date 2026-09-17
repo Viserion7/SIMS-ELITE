@@ -11,8 +11,8 @@ namespace sims_aggregator.Controllers
     public class RelationshipController : ControllerBase
     {
         private readonly dbContext context;
-        private readonly ILogger<Relationship> logger;
-        public RelationshipController(dbContext context, ILogger<Relationship> logger)
+        private readonly ILogger<RelationshipController> logger;
+        public RelationshipController(dbContext context, ILogger<RelationshipController> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -22,6 +22,9 @@ namespace sims_aggregator.Controllers
         [EndpointDescription("Upload Relationship")]
         public async Task<ActionResult> AddRelationship(Relationship arg_relationship)
         {
+            if (arg_relationship.id == Guid.Empty)
+                arg_relationship.id = Guid.NewGuid();
+
             var from_Incident = await context.Incidents.FindAsync(arg_relationship.idFrom);
             var to_Incident = await context.Incidents.FindAsync(arg_relationship.idTo);
 
@@ -68,5 +71,15 @@ namespace sims_aggregator.Controllers
             return Ok(relationships);
         }
 
+        [HttpGet("incident/{incidentId}")]
+        [EndpointDescription("Get all relationships for a specific Incident UUID")]
+        public async Task<ActionResult<IEnumerable<Relationship>>> GetRelationshipsForIncident(Guid incidentId)
+        {
+            var relationships = await this.context.Relationships
+                .Where(r => r.idFrom == incidentId || r.idTo == incidentId)
+                .ToListAsync();
+
+            return Ok(relationships);
+        }
     }
 }
