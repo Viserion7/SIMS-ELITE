@@ -2,9 +2,8 @@ namespace sims_stix_ingest;
 
 using Scalar.AspNetCore;
 using MongoDB.Driver;
-using Controllers;
 using Data;
-using DTOs;
+using Extensions;
 
 public class Program
 {
@@ -37,6 +36,8 @@ public class Program
         //      Row Data Gateway and Data Mapper (EF) need classes for each JSON object, Active Record is overkill
         // 'scoped' indicates that a new instance of the object is created on each request
         builder.Services.AddScoped<IStixGateway, StixGateway>();
+        
+        builder.AddOtel("sims-identity");
 
         var app = builder.Build();
 

@@ -44,9 +44,12 @@ services:
       - MongoDbSettings__DatabaseName=stix_db
       - MongoDbSettings__CollectionName=stix_bundles
       - AggregatorSettings__BaseUrl=http://aggregator:8080
-  depends_on:
+      - OTEL_EXPORTER_OTLP_ENDPOINT__url=${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-}
+    depends_on:
       dbstix:
         condition: service_healthy
+      aggregator:
+        condition: service_started
     restart: unless-stopped
 
   dbidentity:
