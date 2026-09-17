@@ -1,7 +1,8 @@
-namespace sims_stix_ingest;
+namespace sims_stix_ingest.Data;
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+using DTOs;
 
 public class StixGateway : IStixGateway
 {
@@ -32,14 +33,16 @@ public class StixGateway : IStixGateway
     // Aggregator requires individual Domain Objects, therefore split bundle into list of individual Domain Objects
     // query only for necessary properties to save resources
     // return empty list if no match
-    public async Task<List<DomainObject>> ExtractDomainObjectsAsync(string bundleId)
+    public async Task<List<ExtractedDomainObjectDto>> ExtractDomainObjectsAsync(string bundleId)
     {
         var filter = Builders<BsonDocument>.Filter.Eq("_id", bundleId);
 
         var projection = Builders<BsonDocument>.Projection
             .Include("objects.id")
-            .Include("objects.name")
+            .Include("objects.modified")
             .Include("objects.type")
+            .Include("objects.name")
+            .Include("objects.description")
             .Exclude("_id"); 
 
         var queryResult = await _collection
@@ -47,7 +50,7 @@ public class StixGateway : IStixGateway
             .Project(projection)
             .SingleOrDefaultAsync();
 
-        var extractedList = new List<DomainObject>();
+        var extractedList = new List<ExtractedDomainObjectDto>();
         
         if (queryResult == null)
         {
@@ -58,11 +61,13 @@ public class StixGateway : IStixGateway
         {
             if (item is BsonDocument obj)
             {
-                extractedList.Add(new DomainObject 
+                extractedList.Add(new ExtractedDomainObjectDto 
                 {
                     Id = obj.Contains("id") ? obj["id"].AsString : "N/A",
+                    Modified = obj.Contains("modified") ? obj["modified"].AsString : "N/A",
                     Name = obj.Contains("name") && !obj["name"].IsBsonNull ? obj["name"].AsString : "N/A",
-                    Type = obj.Contains("type") ? obj["type"].AsString : "N/A"
+                    Type = obj.Contains("type") ? obj["type"].AsString : "N/A",
+                    Description = obj.Contains("modified") ? obj["id"].AsString : "N/A"
                 });
             }
         }
