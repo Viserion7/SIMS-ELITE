@@ -23,6 +23,7 @@ services:
       POSTGRES_USER: ${AGGR_POSTGRES_USER:-}
       POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD:-}
       POSTGRES_DB: ${AGGR_POSTGRES_DB:-}
+      IDENTITY_URL: ${IDENTITY_URL:-}
     depends_on:
       dbAggregator:
         condition: service_healthy
