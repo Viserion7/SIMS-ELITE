@@ -3,9 +3,10 @@ using sims_aggregator.Models;
 
 namespace sims_aggregator.Data
 {
-    public class IncidentContext: DbContext
+    public class dbContext: DbContext
     {
         public DbSet<Incident> Incidents { get; set; }
+        public DbSet<Relationship> Relationships { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var db_host = Environment.GetEnvironmentVariable("POSTGRES_HOST");

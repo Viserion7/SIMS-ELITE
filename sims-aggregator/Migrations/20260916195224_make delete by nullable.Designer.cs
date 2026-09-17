@@ -11,7 +11,7 @@ using sims_aggregator.Data;
 
 namespace sims_aggregator.Migrations
 {
-    [DbContext(typeof(IncidentContext))]
+    [DbContext(typeof(dbContext))]
     [Migration("20260916195224_make delete by nullable")]
     partial class makedeletebynullable
     {
