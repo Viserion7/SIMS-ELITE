@@ -45,7 +45,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  incidentManager:
+  incident-manager:
     image: ghcr.io/viserion7/sims-elite-incident-manager:latest
     ports:
       - "420:8080"
