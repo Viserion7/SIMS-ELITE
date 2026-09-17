@@ -7,10 +7,13 @@ namespace sims_identity.Controllers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using sims_identity.Data;
+using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -27,10 +30,16 @@ public class UserController : ControllerBase
     [EndpointDescription("Legt einen neuen Benutzer an.")]
     public async Task<ActionResult<CreateUserDto>> CreateUser(CreateUserDto incommingUser)
     {
+
+        if (_context.User.Any(u => u.email == incommingUser.email))
+        {
+            return BadRequest();
+        }
+
         User user = new User
         {
             email = incommingUser.email,
-            password_hash = incommingUser.password, // TO Do noch pw Hash einabuen
+            password_hash = BCrypt.HashPassword(incommingUser.password),
             is_deleted = false
         };
 
@@ -80,7 +89,7 @@ public class UserController : ControllerBase
             return NotFound();
 
         userEntity.email = updatedUser.email;
-        userEntity.password_hash = updatedUser.password; // To Do hash Funktion noch einbauen
+        userEntity.password_hash = BCrypt.HashPassword(updatedUser.password);
         userEntity.is_deleted = updatedUser.is_deleted;
 
         _context.Entry(userEntity).State = EntityState.Modified;

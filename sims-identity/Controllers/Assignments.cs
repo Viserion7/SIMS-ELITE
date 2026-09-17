@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace sims_identity.Controllers;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
+
 using sims_identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize]
 public class AssignmentController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

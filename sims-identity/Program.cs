@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using sims_identity.Extensions;
 using sims_identity.Data;
 
+using sims_identity.Services;
 
 public class Program
 {
@@ -18,11 +19,20 @@ public class Program
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        // Source - https://stackoverflow.com/a/79785013
+        // Posted by Kevin Argueta, modified by community. See post 'Timeline' for change history
+        // Retrieved 2026-09-17, License - CC BY-SA 4.0
 
+        builder.Services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
+
+        builder.Services.AddScoped<AuthService>();
         builder.Logging.AddConsole();
         builder.AddOtel("sims-identity");
         builder.AddEf();
+        builder.AddJwt();
 
         var app = builder.Build();
 
@@ -39,13 +49,21 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.MapScalarApiReference();
+            app.MapScalarApiReference(options =>
+            {
+                options.AddPreferredSecuritySchemes(["Bearer"])
+                    .AddHttpAuthentication("Bearer", bearer =>
+                    {
+                        bearer.Token = string.Empty;
+                    });
+            });
             app.MapOpenApi();
         }
 
 
         app.UseHttpsRedirection();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
 

@@ -30,3 +30,11 @@ public class UserDetailsDto
     public bool is_deleted { get; set; }
     public ICollection<LevelDto> Levels { get; set; }
 }
+
+public class UserAuthorized
+{
+    public int id { get; set; }
+    public string email { get; set; }
+
+    public bool authenticated { get; set; }
+}
