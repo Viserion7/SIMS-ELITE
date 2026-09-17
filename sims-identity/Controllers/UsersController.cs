@@ -106,6 +106,7 @@ public class UserController : ControllerBase
         userEntity.email = updatedUser.email;
         userEntity.password_hash = BCrypt.HashPassword(updatedUser.password);
         userEntity.is_deleted = updatedUser.is_deleted;
+        userEntity.is_Admin = updatedUser.is_Admin;
 
         _context.Entry(userEntity).State = EntityState.Modified;
 

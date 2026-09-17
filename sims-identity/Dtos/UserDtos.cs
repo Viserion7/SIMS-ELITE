@@ -21,6 +21,8 @@ public class UpdateUserDto
     public string email { get; set; }
     public string password { get; set; }
     public bool is_deleted { get; set; }
+
+    public bool is_Admin { get; set; }
 }
 
 public class UserDetailsDto
@@ -28,6 +30,7 @@ public class UserDetailsDto
     public int id { get; set; }
     public string email { get; set; }
     public bool is_deleted { get; set; }
+    public bool is_Admin { get; set; }
     public ICollection<LevelDto> Levels { get; set; }
 }
 
