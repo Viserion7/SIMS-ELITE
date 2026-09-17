@@ -9,7 +9,7 @@
 depl-kram/sonstigeContainer/signoz/depl/pours
 
 
-sims-identity/Migrations
+#sims-identity/Migrations
 # macht das sinn?
 sims-identity/appsettings.Development.json
 
