@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = "isAdmin")]
 public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

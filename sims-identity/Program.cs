@@ -33,6 +33,7 @@ public class Program
         builder.AddOtel("sims-identity");
         builder.AddEf();
         builder.AddJwt();
+        builder.AddAuthorizationPolicies();
 
         var app = builder.Build();
 
@@ -63,6 +64,7 @@ public class Program
 
         app.UseHttpsRedirection();
 
+        //Mit Policies vor Authorisazion beabrietet werden!
         app.UseAuthentication();
         app.UseAuthorization();
 
