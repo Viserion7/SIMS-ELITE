@@ -10,10 +10,10 @@ namespace sims_aggregator.Controllers
     [ApiController]
     public class IncidentsController: ControllerBase
     {
-        private readonly IncidentContext context;
+        private readonly dbContext context;
         private readonly ILogger<IncidentsController> logger;
 
-        public IncidentsController(IncidentContext context, ILogger<IncidentsController> logger)
+        public IncidentsController(dbContext context, ILogger<IncidentsController> logger)
         {
             this.context = context;
             this.logger = logger;

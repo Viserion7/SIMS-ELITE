@@ -10,7 +10,7 @@ using sims_aggregator.Data;
 
 namespace sims_aggregator.Migrations
 {
-    [DbContext(typeof(IncidentContext))]
+    [DbContext(typeof(dbContext))]
     partial class IncidentContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -43,7 +43,7 @@ public class Program
         });
 
         // HTTP aufsetzen
-        builder.Services.AddDbContext<IncidentContext>(); // damit in Controller auf DB Context zugreifen können
+        builder.Services.AddDbContext<dbContext>(); // damit in Controller auf DB Context zugreifen können
         // Add services to the container.
         builder.Services.AddControllers(); // In Controller/ gibt es Klassen das sind unsere ControllerKlassen
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -54,7 +54,7 @@ public class Program
         // Erstellt automatisch alle fehlenden Tabellen in Postgres!
         using (var scope = app.Services.CreateScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<IncidentContext>();
+            var db = scope.ServiceProvider.GetRequiredService<dbContext>();
             db.Database.EnsureCreated();
         }
 
