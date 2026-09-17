@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="sims-aggregator/sims-aggregator.csproj" />
   <Project Path="sims-identity/sims-identity.csproj" />
+  <Project Path="sims-incidentManager/sims-incidentManager.csproj" />
   <Project Path="sims-stix-ingest/sims-stix-ingest.csproj" />
 </Solution>
