@@ -2,6 +2,9 @@ namespace sims_stix_ingest;
 
 using Scalar.AspNetCore;
 using MongoDB.Driver;
+using Controllers;
+using Data;
+using DTOs;
 
 public class Program
 {
@@ -12,6 +15,8 @@ public class Program
         builder.Services.AddControllers();
         
         builder.Services.AddOpenApi();
+        
+        builder.Services.AddHttpClient();
         
         // credentials are passed as environment variables to avoid secrets in code
         var connectionString = builder.Configuration["MongoDbSettings:ConnectionString"];
