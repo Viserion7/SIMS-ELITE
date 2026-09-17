@@ -29,6 +29,7 @@ public class Program
         });
 
         builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<UserService>();
         builder.Logging.AddConsole();
         builder.AddOtel("sims-identity");
         builder.AddEf();

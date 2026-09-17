@@ -9,25 +9,30 @@ using Microsoft.Extensions.Logging;
 using sims_identity.Data;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
+using sims_identity.Services;
 
 
 [Route("api/v1/[controller]")]
 [ApiController]
-[Authorize(Policy = "isAdmin")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly ILogger<UserController> _logger;
 
-    public UserController(ApplicationDbContext context, ILogger<UserController> logger)
+    private readonly UserService _userService;
+
+    public UserController(ApplicationDbContext context, ILogger<UserController> logger, UserService userService)
     {
         _context = context;
         _logger = logger;
+        _userService = userService;
     }
 
 
     [HttpPost]
-    [EndpointDescription("Legt einen neuen Benutzer an.")]
+    [Authorize(Policy = "isAdmin")]
+    [EndpointDescription("Legt einen neuen Benutzer an.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<CreateUserDto>> CreateUser(CreateUserDto incommingUser)
     {
 
@@ -52,9 +57,17 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [EndpointDescription("Gibt die Daten eines Benutzers zurück. Wenn kein Benutzer mit dieser ID existiert, wird 404 zurückgegeben.")]
+    [EndpointDescription("Gibt die Daten eines Benutzers zurück. Wenn kein Benutzer mit dieser ID existiert, wird 404 zurückgegeben.\n\nEinschränkung:\n- Eigene Daten: erlaubt\n- Andere Benutzer: nur Administratoren")]
     public async Task<ActionResult<UserDto>> GetUser(int id)
     {
+        if (!await IsUserAllowed(id))
+        {
+            return Forbid();
+        }
+
+
+
+
         var user = await _context.User.
             Where(user => user.id == id)
             .Select(user => new UserDto
@@ -71,7 +84,8 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    [EndpointDescription("Gibt alle Benutzer zurück.")]
+    [Authorize(Policy = "isAdmin")]
+    [EndpointDescription("Gibt alle Benutzer zurück.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
     {
         return await _context.User.ToArrayAsync();
@@ -79,7 +93,8 @@ public class UserController : ControllerBase
 
 
     [HttpPut("{id}")]
-    [EndpointDescription("Ändert die Daten eines Benutzers.")]
+    [Authorize(Policy = "isAdmin")]
+    [EndpointDescription("Ändert die Daten eines Benutzers.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult> UpdateUser(int id, UpdateUserDto updatedUser)
     {
 
@@ -108,7 +123,8 @@ public class UserController : ControllerBase
 
 
     [HttpDelete("{id}")]
-    [EndpointDescription("Markiert einen Benutzer als gelöscht.")]
+    [Authorize(Policy = "isAdmin")]
+    [EndpointDescription("Markiert einen Benutzer als gelöscht.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<IActionResult> DeleteUser(int id)
     {
         var user = await _context.User.FindAsync(id);
@@ -129,9 +145,15 @@ public class UserController : ControllerBase
 
     }
     [HttpGet("{id}/details")]
-    [EndpointDescription("Gibt einen Benutzer mit seinen Levels und Kategorien zurück.")]
+    [EndpointDescription("Gibt einen Benutzer mit seinen Levels und Kategorien zurück.\n\nEinschränkung:\n- Eigene Daten: erlaubt\n- Andere Benutzer: nur Administratoren")]
     public async Task<ActionResult<User>> GetDetails(int id)
     {
+        if (!await IsUserAllowed(id))
+        {
+            return Forbid();
+        }
+
+
         var user = await _context.User
     .Include(user => user.Levels)
         .ThenInclude(level => level.Categorys)
@@ -142,5 +164,17 @@ public class UserController : ControllerBase
 
         return user;
     }
+
+    private async Task<bool> IsUserAllowed(int requestedUserId)
+    {
+        var userIdClaim = Int32.Parse(User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value);
+        var allowed = await _userService.CheckuserID(userIdClaim, requestedUserId);
+        if (!allowed)
+        {
+            return false;
+        }
+        return true;
+    }
+
 
 }

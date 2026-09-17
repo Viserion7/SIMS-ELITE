@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 [Route("api/v1/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = "isAdmin")]
 public class AssignmentController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -26,7 +26,7 @@ public class AssignmentController : ControllerBase
 
 
     [HttpPost("user/{id}/level/{levelid}")]
-    [EndpointDescription("Weist einem Benutzer ein Level zu.")]
+    [EndpointDescription("Weist einem Benutzer ein Level zu.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<User>> LevelUserZuweisen(int id, int levelid)
     {
         var user = await _context.User.
@@ -47,7 +47,7 @@ public class AssignmentController : ControllerBase
     }
 
     [HttpDelete("user/{id}/level/{levelid}")]
-    [EndpointDescription("Entfernt ein Level von einem Benutzer.")]
+    [EndpointDescription("Entfernt ein Level von einem Benutzer.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<User>> LevelVonUserLoeschen(int id, int levelid)
     {
         var user = await _context.User.

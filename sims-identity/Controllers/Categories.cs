@@ -26,7 +26,7 @@ public class CategoriesController : ControllerBase
 
 
     [HttpGet("categories")]
-    [EndpointDescription("Gibt alle Kategorien zurück.")]
+    [EndpointDescription("Gibt alle Kategorien zurück.\n\nEinschränkung:\n- Jeder angemeldete Benutzer")]
     public async Task<ActionResult<List<Category>>> GetAllCategories()
     {
         return _context.Category.ToList();

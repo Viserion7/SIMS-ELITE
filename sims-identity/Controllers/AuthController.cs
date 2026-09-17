@@ -77,6 +77,7 @@ public class AuthController : ControllerBase
 
 
     [HttpPost("logout")]
+    [Authorize]
     [EndpointDescription("Revoken den RefreshToken")]
     public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
     {

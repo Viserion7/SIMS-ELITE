@@ -1,5 +1,7 @@
 namespace sims_identity.Data;
 
+using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
 
 
 public class Seeder
@@ -16,6 +18,19 @@ public class Seeder
         try
         {
             await context.Database.EnsureCreatedAsync();
+
+            if (!await context.User.AnyAsync())
+            {
+                context.User.Add(new User
+                {
+                    email = "admin@local",
+                    password_hash = BCrypt.HashPassword("admin"),
+                    is_deleted = false,
+                    is_Admin = true
+                });
+
+                await context.SaveChangesAsync();
+            }
 
             List<Level> levels = new List<Level>
             {
