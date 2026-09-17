@@ -46,6 +46,7 @@ public class Program
         builder.Services.AddDbContext<dbContext>(); // damit in Controller auf DB Context zugreifen können
         // Add services to the container.
         builder.Services.AddControllers(); // In Controller/ gibt es Klassen das sind unsere ControllerKlassen
+        builder.Services.AddHttpClient(); // Http Client injecten
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi(); // API Configs erstellen
 

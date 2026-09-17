@@ -11,7 +11,7 @@ namespace sims_aggregator.Models
         public DateTime created_at { get; set; } // received from TAXII
         public DateTime db_created_at { get; set; } // when written inside db
         public bool is_deleted { get; set; }
-        public Guid? deleted_by { get; set; } = null;
+        public int? deleted_by { get; set; } = null;
         public string source_format { get; set; } = ""; // taxii or raw json or what...
 
         // -- now all the TAXII specific values
