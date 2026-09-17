@@ -3,14 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace sims_identity.Controllers;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
+
 using sims_identity.Data;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize(Policy = "isAdmin")]
 public class AssignmentController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -23,18 +25,46 @@ public class AssignmentController : ControllerBase
     }
 
 
-    [HttpPost("user/{id}/level")]
-    [EndpointDescription("Weist einem Benutzer ein Level zu.")]
-    public async Task<ActionResult<User>> LevelUserZuweisen(int id)
+    [HttpPost("user/{id}/level/{levelid}")]
+    [EndpointDescription("Weist einem Benutzer ein Level zu.\n\nEinschränkung:\n- Nur Administratoren")]
+    public async Task<ActionResult<User>> LevelUserZuweisen(int id, int levelid)
     {
-        return NoContent(); // to do
+        var user = await _context.User.
+            Where(user => user.id == id).FirstOrDefaultAsync();
+
+        var level = await _context.Level.
+            Where(level => level.id == levelid).FirstOrDefaultAsync();
+
+        if (user == null || level == null)
+        {
+            return NotFound();
+        }
+
+        user.Levels.Add(level);
+        await _context.SaveChangesAsync();
+
+        return Ok(user);
     }
 
     [HttpDelete("user/{id}/level/{levelid}")]
-    [EndpointDescription("Entfernt ein Level von einem Benutzer.")]
+    [EndpointDescription("Entfernt ein Level von einem Benutzer.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<User>> LevelVonUserLoeschen(int id, int levelid)
     {
-        return NoContent(); // to do
+        var user = await _context.User.
+            Where(user => user.id == id).FirstOrDefaultAsync();
+
+        var level = await _context.Level.
+            Where(level => level.id == levelid).FirstOrDefaultAsync();
+
+        if (user == null || level == null)
+        {
+            return NotFound();
+        }
+
+        user.Levels.Remove(level);
+        await _context.SaveChangesAsync();
+
+        return Ok(user);
     }
 
 

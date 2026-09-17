@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace sims_identity.Controllers;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
+
 using sims_identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 
 [Route("api/v1/[controller]")]
 [ApiController]
+[Authorize]
 public class CategoriesController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -25,7 +26,7 @@ public class CategoriesController : ControllerBase
 
 
     [HttpGet("categories")]
-    [EndpointDescription("Gibt alle Kategorien zurück.")]
+    [EndpointDescription("Gibt alle Kategorien zurück.\n\nEinschränkung:\n- Jeder angemeldete Benutzer")]
     public async Task<ActionResult<List<Category>>> GetAllCategories()
     {
         return _context.Category.ToList();

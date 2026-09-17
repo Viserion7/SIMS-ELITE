@@ -7,5 +7,7 @@ public class User
 
     public bool is_deleted { get; set; }
 
+    public bool is_Admin { get; set; }
+
     public ICollection<Level> Levels { get; set; } = new List<Level>();
 }

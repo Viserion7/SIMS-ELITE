@@ -30,6 +30,10 @@ services:
 
   identity:
     build: ../../sims-identity
+    environment:
+      Jwt__Key: ${JWT__KEY:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT__url: ${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-}
+      connectionString: "Host=dbidentity;Port=5432;Username=${ID_POSTGRES_USER};Password=${ID_POSTGRES_PASSWORD};Database=${ID_POSTGRES_DB}"
     depends_on:
       dbidentity:
         condition: service_healthy

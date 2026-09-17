@@ -4,9 +4,10 @@ using sims_identity.Dtos;
 
 namespace sims_identity.Controllers;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using sims_identity.Data;
+using sims_identity.Services;
+using Microsoft.AspNetCore.Authorization;
 
 
 [Route("api/v1/[controller]")]
@@ -16,10 +17,13 @@ public class AuthController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ApplicationDbContext context, ILogger<AuthController> logger)
+    private readonly AuthService _authService;
+
+    public AuthController(ApplicationDbContext context, ILogger<AuthController> logger, AuthService authService)
     {
         _context = context;
         _logger = logger;
+        _authService = authService;
     }
 
 
@@ -27,48 +31,63 @@ public class AuthController : ControllerBase
     [EndpointDescription("Meldet einen Benutzer an.")]
     public async Task<ActionResult<User>> LoginUser(CreateUserDto user)
     {
-        User? bestehendesItem = _context.User
-                .FirstOrDefault(inDbSchonExestierend => inDbSchonExestierend.email == user.email);
-        if (bestehendesItem == null)
+        var response = await _authService.LoginAsync(user);
+        if (response == null)
         {
-            return NotFound();
-        }
-        if (bestehendesItem.password_hash != user.password) // to do noch pw hash einbauen
-        {
-            return Unauthorized();
+            return Unauthorized("Invalid username or password.");
         }
 
-        return Ok(new
-        {
-            message = "Login erfolgreich",
-            userId = bestehendesItem.id,
-            email = bestehendesItem.email,
-            token = "eyJh..."
-        });
+        return Ok(response);
     }
 
 
 
     [HttpGet("me")]
+    [Authorize]
     [EndpointDescription("Gibt den aktuell angemeldeten Benutzer zurück.")]
-    public async Task<ActionResult<TokenDto>> GetMe(TokenDto token)
+    public async Task<ActionResult<UserAuthorized>> GetMe()
     {
-        return token; // To Do Implement me
+        var userId = Int32.Parse(User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value);
+        var useremail = User.FindFirst("name")?.Value;
+
+        UserAuthorized user = new UserAuthorized
+        {
+            id = userId,
+            email = useremail,
+            authenticated = true
+
+        };
+
+        return Ok(user);
     }
 
     [HttpPost("refresh")]
     [EndpointDescription("Erstellt ein neues Zugriffstoken.")]
-    public async Task<ActionResult<TokenDto>> RefreshMe(TokenDto token)
+    public async Task<ActionResult<TokenResponse>> RefreshMe([FromBody] RefreshTokenRequest request)
     {
-        return token; // To Do Implement me
+        var response = await _authService.RefreshTokenAsync(request.RefreshToken);
+        if (response == null)
+        {
+            return Unauthorized("Invalid or expired refresh token.");
+        }
+
+        return Ok(response);
     }
+
+
 
     [HttpPost("logout")]
-    [EndpointDescription("Meldet den Benutzer ab.")]
-    public async Task<ActionResult<TokenDto>> LogoutMe(TokenDto token)
+    [Authorize]
+    [EndpointDescription("Revoken den RefreshToken")]
+    public async Task<IActionResult> Logout([FromBody] RefreshTokenRequest request)
     {
-        return token; // To Do Implement me
-    }
+        var success = await _authService.RevokeRefreshTokenAsync(request.RefreshToken);
+        if (!success)
+        {
+            return BadRequest("Invalid or already revoked refresh token.");
+        }
 
+        return Ok("Refresh token revoked.");
+    }
 
 }

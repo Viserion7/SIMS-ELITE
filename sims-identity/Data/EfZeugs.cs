@@ -9,5 +9,6 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> User { get; set; }
     public DbSet<Category> Category { get; set; }
     public DbSet<Level> Level { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 }

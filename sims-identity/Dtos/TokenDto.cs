@@ -1,6 +1,12 @@
 namespace sims_identity.Dtos;
 
-public class TokenDto
+public class TokenResponse
 {
-    public string token { get; set; }
+    public string AccessToken { get; set; } = string.Empty;
+    public string RefreshToken { get; set; } = string.Empty;
+}
+
+public class RefreshTokenRequest
+{
+    public string RefreshToken { get; set; } = string.Empty;
 }
