@@ -169,7 +169,7 @@ public class StixController : ControllerBase
                 }
             }
             
-            string aggregatorRelationshipTargetUrl = $"{aggregatorBaseUrl}/api/v1/Relationships";
+            string aggregatorRelationshipTargetUrl = $"{aggregatorBaseUrl}/api/v1/Relationship";
             int relationshipsCreated = 0;
             int relationshipConflicts = 0;
             foreach (var obj in relationshipObjects)
