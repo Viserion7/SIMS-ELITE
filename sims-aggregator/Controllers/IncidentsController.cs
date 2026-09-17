@@ -20,7 +20,7 @@ namespace sims_aggregator.Controllers
         }
 
         [HttpGet("{id}")]
-        [EndpointDescription("Get Incident data")]
+        [EndpointDescription("Get Incident data of an ID")]
         public async Task<ActionResult<Incident>> GetIncident(Guid id)
         {
 
@@ -33,6 +33,23 @@ namespace sims_aggregator.Controllers
             }
 
             return Ok(incident);
+        }
+
+        [HttpGet("{page}/{count}")]
+        [EndpointDescription("Get all Incident data")]
+        public async Task<ActionResult<Incident[]>> GetIncidents(int page,int count)
+        {
+            if (page < 0 || count <= 0)
+                return BadRequest(">:( must be >= 0 and count must be > 0.");
+
+            var incidents = await this.context.Incidents
+                .Where(i => !i.is_deleted)      // Gelöschte nicht mitgeben!
+                .OrderByDescending(i => i.db_created_at) // Bei Paging IMMER sortieren, sonst springen die Daten
+                .Skip(page * count)             // Überspringe die vorherigen Seiten
+                .Take(count)                    // Nimm nur die gewünschte Anzahl
+                .ToListAsync();
+
+            return Ok(incidents);
         }
 
         [HttpPost]
@@ -56,7 +73,7 @@ namespace sims_aggregator.Controllers
             };
 
             this.context.Incidents.Add(incident);
-            this.context.SaveChanges();
+            await this.context.SaveChangesAsync();
 
             return Created();
         }
@@ -75,9 +92,9 @@ namespace sims_aggregator.Controllers
 
             incident.is_deleted = true;
 
-            this.context.SaveChanges();
+            await this.context.SaveChangesAsync();
 
-            return Created();
+            return NoContent();
         }
 
     }
