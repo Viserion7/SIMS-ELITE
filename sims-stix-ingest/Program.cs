@@ -37,7 +37,7 @@ public class Program
         // 'scoped' indicates that a new instance of the object is created on each request
         builder.Services.AddScoped<IStixGateway, StixGateway>();
         
-        builder.AddOtel("sims-identity");
+        builder.AddOtel("sims-stix-ingest");
 
         var app = builder.Build();
 
