@@ -5,10 +5,10 @@ using System.Text.Json.Serialization;
 public class AggregatorDomainObjectDto
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } = Guid.Empty;
 
-    [JsonPropertyName("modified")]
-    public string Modified { get; set; } = string.Empty;
+    [JsonPropertyName("created_at")]
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [JsonPropertyName("type")]
     public string Type { get; set; } = string.Empty;
@@ -16,8 +16,8 @@ public class AggregatorDomainObjectDto
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("description")]
-    public string Description { get; set; } = string.Empty;
+    [JsonPropertyName("desc")]
+    public string Desc { get; set; } = string.Empty;
 
     [JsonPropertyName("source_format")]
     public string SourceFormat { get; set; } = "stix";
