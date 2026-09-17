@@ -28,7 +28,7 @@ namespace sims_aggregator.Controllers
             if (from_Incident == null || to_Incident == null)
                 return NotFound("Incident was not found.");
 
-            if (from_Incident == to_Incident)
+            if (arg_relationship.idFrom == arg_relationship.idTo)
                 return Conflict("from and to Incident may not be the same");
 
             if (await context.Relationships.FindAsync(arg_relationship.id) != null)
