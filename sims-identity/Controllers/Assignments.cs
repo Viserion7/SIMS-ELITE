@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using sims_identity.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 
 [Route("api/v1/[controller]")]
@@ -24,18 +25,46 @@ public class AssignmentController : ControllerBase
     }
 
 
-    [HttpPost("user/{id}/level")]
+    [HttpPost("user/{id}/level/{levelid}")]
     [EndpointDescription("Weist einem Benutzer ein Level zu.")]
-    public async Task<ActionResult<User>> LevelUserZuweisen(int id)
+    public async Task<ActionResult<User>> LevelUserZuweisen(int id, int levelid)
     {
-        return NoContent(); // to do
+        var user = await _context.User.
+            Where(user => user.id == id).FirstOrDefaultAsync();
+
+        var level = await _context.Level.
+            Where(level => level.id == levelid).FirstOrDefaultAsync();
+
+        if (user == null || level == null)
+        {
+            return NotFound();
+        }
+
+        user.Levels.Add(level);
+        await _context.SaveChangesAsync();
+
+        return Ok(user);
     }
 
     [HttpDelete("user/{id}/level/{levelid}")]
     [EndpointDescription("Entfernt ein Level von einem Benutzer.")]
     public async Task<ActionResult<User>> LevelVonUserLoeschen(int id, int levelid)
     {
-        return NoContent(); // to do
+        var user = await _context.User.
+            Where(user => user.id == id).FirstOrDefaultAsync();
+
+        var level = await _context.Level.
+            Where(level => level.id == levelid).FirstOrDefaultAsync();
+
+        if (user == null || level == null)
+        {
+            return NotFound();
+        }
+
+        user.Levels.Remove(level);
+        await _context.SaveChangesAsync();
+
+        return Ok(user);
     }
 
 
