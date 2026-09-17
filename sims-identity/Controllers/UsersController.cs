@@ -74,7 +74,9 @@ public class UserController : ControllerBase
             {
                 id = user.id,
                 email = user.email,
-                is_deleted = user.is_deleted
+                is_deleted = user.is_deleted,
+                is_Admin = user.is_Admin,
+                is_ToNotify = user.is_ToNotify
             }).FirstOrDefaultAsync();
 
         if (user == null)
@@ -103,10 +105,20 @@ public class UserController : ControllerBase
         if (userEntity == null)
             return NotFound();
 
-        userEntity.email = updatedUser.email;
-        userEntity.password_hash = BCrypt.HashPassword(updatedUser.password);
-        userEntity.is_deleted = updatedUser.is_deleted;
-        userEntity.is_Admin = updatedUser.is_Admin;
+        if (updatedUser.email is not null)
+            userEntity.email = updatedUser.email;
+
+        if (!string.IsNullOrWhiteSpace(updatedUser.password))
+            userEntity.password_hash = BCrypt.HashPassword(updatedUser.password);
+
+        if (updatedUser.is_deleted.HasValue)
+            userEntity.is_deleted = updatedUser.is_deleted.Value;
+
+        if (updatedUser.is_Admin.HasValue)
+            userEntity.is_Admin = updatedUser.is_Admin.Value;
+
+        if (updatedUser.is_ToNotify.HasValue)
+            userEntity.is_ToNotify = updatedUser.is_ToNotify.Value;
 
         _context.Entry(userEntity).State = EntityState.Modified;
 
@@ -164,6 +176,23 @@ public class UserController : ControllerBase
             return NotFound();
 
         return user;
+    }
+
+    [HttpGet("toNotify")]
+    [AllowAnonymous]
+    [EndpointDescription("Gibts alle Emails an die im Escalationsfall geschickt werden soll.")]
+    public async Task<ActionResult<IEnumerable<UsersToNotify>>> GetMails()
+    {
+        var usersToNotify = await _context.User
+            .Where(user => user.is_ToNotify)
+            .Select(user => new UsersToNotify
+            {
+                id = user.id,
+                email = user.email
+            })
+            .ToListAsync();
+
+        return usersToNotify;
     }
 
     private async Task<bool> IsUserAllowed(int requestedUserId)

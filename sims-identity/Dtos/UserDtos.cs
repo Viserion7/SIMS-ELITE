@@ -8,6 +8,8 @@ public class UserDto
     public int id { get; set; }
     public string email { get; set; }
     public bool is_deleted { get; set; }
+    public bool is_Admin { get; set; }
+    public bool is_ToNotify { get; set; }
 }
 
 public class CreateUserDto
@@ -18,11 +20,11 @@ public class CreateUserDto
 
 public class UpdateUserDto
 {
-    public string email { get; set; }
-    public string password { get; set; }
-    public bool is_deleted { get; set; }
-
-    public bool is_Admin { get; set; }
+    public string? email { get; set; }
+    public string? password { get; set; }
+    public bool? is_deleted { get; set; }
+    public bool? is_Admin { get; set; }
+    public bool? is_ToNotify { get; set; }
 }
 
 public class UserDetailsDto
@@ -31,6 +33,7 @@ public class UserDetailsDto
     public string email { get; set; }
     public bool is_deleted { get; set; }
     public bool is_Admin { get; set; }
+    public bool is_ToNotify { get; set; }
     public ICollection<LevelDto> Levels { get; set; }
 }
 
@@ -40,4 +43,11 @@ public class UserAuthorized
     public string email { get; set; }
 
     public bool authenticated { get; set; }
+}
+
+
+public class UsersToNotify
+{
+    public int id { get; set; }
+    public string email { get; set; }
 }

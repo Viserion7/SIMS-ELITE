@@ -26,7 +26,9 @@ public class Seeder
                     email = "admin@local",
                     password_hash = BCrypt.HashPassword("admin"),
                     is_deleted = false,
-                    is_Admin = true
+                    is_Admin = true,
+                    is_ToNotify = true
+
                 });
 
                 await context.SaveChangesAsync();
