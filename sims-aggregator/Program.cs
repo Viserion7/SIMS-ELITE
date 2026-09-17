@@ -15,6 +15,7 @@ public class Program
         // setup openTelemetry
         var serviceName_openTelemetry = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME") ?? "sims-aggregator";
         var endpoint_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
+        var key_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
 
         builder.Services.AddOpenTelemetry() // setup OpenTelemetry tracing
         .WithTracing(tpb =>
@@ -25,6 +26,7 @@ public class Program
                .AddOtlpExporter(otlp =>
                {
                    otlp.Endpoint = new Uri(endpoint_opentelemetry); // Replace with SigNoz OTLP endpoint
+                   otlp.Headers = $"signoz-ingestion-key={key_opentelemetry}";
                });
         });
 
@@ -39,6 +41,7 @@ public class Program
             opt.AddOtlpExporter(otlp =>
             {
                 otlp.Endpoint = new Uri(endpoint_opentelemetry);
+                otlp.Headers = $"signoz-ingestion-key={key_opentelemetry}";
             });
         });
 
