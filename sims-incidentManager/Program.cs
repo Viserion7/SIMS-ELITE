@@ -16,7 +16,6 @@ public class Program
         var serviceName_openTelemetry = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME") ?? "sims-incidentManager";
         var endpoint_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
         var key_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT__KEY");
-        Console.WriteLine($"AAAAAAAAAAAAA: ${serviceName_openTelemetry} §{endpoint_opentelemetry} ${key_opentelemetry}");
 
         builder.Services.AddOpenTelemetry() // setup OpenTelemetry tracing
         .WithTracing(tpb =>
@@ -50,6 +49,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllers();
+        builder.Services.AddHttpClient(); // Http Client injecten
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
