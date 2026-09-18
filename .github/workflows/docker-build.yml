@@ -17,7 +17,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -79,4 +79,57 @@ jobs:
       # To Do Weitere
       # ==========================================
 
+      # ==========================================
+      # SBOM GENERATION & DEPENDENCY-TRACK
+      # ==========================================
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install CycloneDX CLI Tool
+        run: dotnet tool install --global CycloneDX
+
+      - name: Generate and Upload SBOMs to Dependency-Track
+        env:
+          DEPTRACK_URL: ${{ secrets.DEPENDENCY_TRACK_URL }}
+          DEPTRACK_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+        run: |
+          mkdir -p ./sbom-output
+
+          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest")
+
+          for SERVICE in "${SERVICES[@]}"; do
+            dotnet-cyclonedx "$SERVICE/$SERVICE.csproj" \
+              -o ./sbom-output \
+              -f "bom-$SERVICE.json" \
+              --json
+
+            RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$DEPTRACK_URL/api/v1/bom" \
+              -H "X-Api-Key: $DEPTRACK_KEY" \
+              -F "projectName=$SERVICE" \
+              -F "projectVersion=${{ github.ref_name }}" \
+              -F "autoCreate=true" \
+              -F "bom=@./sbom-output/bom-$SERVICE.json")
+
+            HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
+
+            if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+              echo "SUCCESS: $SERVICE successfully ingested by Dependency-Track!"
+            else
+              echo "ERROR: Dependency-Track rejected $SERVICE (HTTP $HTTP_STATUS)"
+              echo "$RESPONSE"
+              exit 1
+            fi
+          done
+
+      # ==========================================
+      # ATTACH TO GITHUB RELEASE
+      # ==========================================
+      - name: Attach SBOMs to GitHub Release
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} ./sbom-output/bom-*.json --clobber
      
