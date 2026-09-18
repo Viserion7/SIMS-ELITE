@@ -39,3 +39,13 @@ export const aggregatorApiClient = <ResponseData = unknown>(
   endpoint: string,
   options: ApiRequestOptions = {},
 ) => apiClient<ResponseData>(endpoint, options, 'aggregator')
+
+export const incidentManagerApiClient = <ResponseData = unknown>(
+  endpoint: string,
+  options: ApiRequestOptions = {},
+) => apiClient<ResponseData>(endpoint, options, 'incidentManager')
+
+export const stixApiClient = <ResponseData = unknown>(
+  endpoint: string,
+  options: ApiRequestOptions = {},
+) => apiClient<ResponseData>(endpoint, options, 'stix')

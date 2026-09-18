@@ -6,15 +6,21 @@ services:
     environment:
       IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
       AGGREGATOR_URL: ${AGGREGATOR_URL:-http://aggregator:8080}
+      INCIDENT_MANAGER_URL: ${INCIDENT_MANAGER_URL:-http://incident-manager:8080}
+      STIX_URL: ${STIX_URL:-http://sims-stix-ingest:8080}
     depends_on:
       - aggregator
       - identity
+      - incident-manager
+      - sims-stix-ingest
     restart: unless-stopped
 
   aggregator:
     image: ghcr.io/viserion7/sims-elite-aggregator:latest
-    ports:
-      - "88:8080"
+    # ports:
+    #   - "88:8080" # Auskommentiert: Nur intern über Frontend Reverse-Proxy erreichbar
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-sims-aggregator}
@@ -32,8 +38,10 @@ services:
 
   identity:
     image: ghcr.io/viserion7/sims-elite-identity:latest
-    ports:
-      - "67:8080"
+    # ports:
+    #   - "67:8080" # Auskommentiert: Nur intern über Frontend Reverse-Proxy erreichbar
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       Jwt__Key: ${JWT__KEY:-}
@@ -47,8 +55,10 @@ services:
 
   incident-manager:
     image: ghcr.io/viserion7/sims-elite-incident-manager:latest
-    ports:
-      - "420:8080"
+    # ports:
+    #   - "420:8080" # Auskommentiert: Nur intern über Frontend Reverse-Proxy erreichbar
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       OTEL_SERVICE_NAME: ${INC_OTEL_SERVICE_NAME:-sims-incidentManager}
@@ -65,8 +75,10 @@ services:
   
   sims-stix-ingest:
     image: ghcr.io/viserion7/sims-elite-stix-ingest:latest
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "8080:8080" # Auskommentiert: Nur intern über Frontend Reverse-Proxy erreichbar
+    expose:
+      - "8080"
     environment:
       - MongoDbSettings__ConnectionString=mongodb://${STIX_MONGO_USER}:${STIX_MONGO_PASSWORD}@dbstix:27017/?authSource=admin
       - MongoDbSettings__DatabaseName=stix_db
