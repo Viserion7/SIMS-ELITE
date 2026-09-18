@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useIncidentsQuery } from '@/composables/queries/useIncidentQueries'
+import { useIncidentsQuery, useDeleteIncidentMutation } from '@/composables/queries/useIncidentQueries'
 import { useMyCategories } from '@/composables/useMyCategories'
 import type { Incident } from '@/types'
 import PageHeader from '@/components/PageHeader.vue'
@@ -9,8 +9,13 @@ import EmptyState from '@/components/EmptyState.vue'
 import IncidentCard from '@/components/IncidentCard.vue'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
+const confirm = useConfirm()
+const toast = useToast()
+const deleteMutation = useDeleteIncidentMutation()
 const allowedTypes = useMyCategories()
 
 const page = ref(0)
@@ -21,15 +26,17 @@ const { data: rawIncidents, isPending, isError } = useIncidentsQuery(page, count
 const allLoadedIncidents = ref<Incident[]>([])
 const hasMoreToLoad = ref(true)
 
-import { watch } from 'vue'
 watch(rawIncidents, (newIncidents) => {
   if (newIncidents) {
     if (newIncidents.length < count.value) {
       hasMoreToLoad.value = false
     }
-    
-    const newItems = newIncidents.filter(n => !allLoadedIncidents.value.some(o => o.id === n.id))
-    allLoadedIncidents.value.push(...newItems)
+    if (page.value === 0) {
+      allLoadedIncidents.value = [...newIncidents]
+    } else {
+      const newItems = newIncidents.filter(n => !allLoadedIncidents.value.some(o => o.id === n.id))
+      allLoadedIncidents.value.push(...newItems)
+    }
   }
 }, { immediate: true })
 
@@ -40,6 +47,36 @@ const loadMore = () => {
 
 const goToDetail = (incident: Incident) => {
   router.push(`/incidents/${incident.id}`)
+}
+
+const handleDeleteIncident = (incident: Incident) => {
+  confirm.require({
+    message: `Möchtest du den Vorfall "${incident.name || incident.id}" wirklich als gesehen markieren? Er wird danach aus allen aktiven Listen ausgeblendet.`,
+    header: 'Vorfall als gesehen markieren',
+    icon: 'pi pi-check-circle',
+    acceptLabel: 'Als gesehen markieren',
+    rejectLabel: 'Abbrechen',
+    acceptClass: 'p-button-success',
+    accept: async () => {
+      try {
+        await deleteMutation.mutateAsync(incident.id)
+        allLoadedIncidents.value = allLoadedIncidents.value.filter(i => i.id !== incident.id)
+        toast.add({
+          severity: 'success',
+          summary: 'Als gesehen markiert',
+          detail: 'Der Vorfall wurde erfolgreich als gesehen markiert.',
+          life: 3000,
+        })
+      } catch (err: any) {
+        toast.add({
+          severity: 'error',
+          summary: 'Fehler',
+          detail: err?.message || 'Konnte nicht als gesehen markiert werden.',
+          life: 4000,
+        })
+      }
+    },
+  })
 }
 </script>
 
@@ -71,6 +108,7 @@ const goToDetail = (incident: Incident) => {
           :incident="incident" 
           :highlighted="allowedTypes.has(incident.type)"
           @click="goToDetail"
+          @delete="handleDeleteIncident"
         />
         
         <template v-if="isPending">
@@ -102,8 +140,7 @@ const goToDetail = (incident: Incident) => {
 
 .load-more-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
   margin-top: 3rem;
   padding-top: 2rem;
   border-top: 1px dashed var(--border-color);
