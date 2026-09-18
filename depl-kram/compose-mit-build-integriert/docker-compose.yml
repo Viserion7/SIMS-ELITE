@@ -6,15 +6,21 @@ services:
     environment:
       IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
       AGGREGATOR_URL: ${AGGREGATOR_URL:-http://aggregator:8080}
+      INCIDENT_MANAGER_URL: ${INCIDENT_MANAGER_URL:-http://incident-manager:8080}
+      STIX_URL: ${STIX_URL:-http://sims-stix-ingest:8080}
     depends_on:
       - aggregator
       - identity
+      - incident-manager
+      - sims-stix-ingest
     restart: unless-stopped
 
   aggregator:
     build: ../../sims-aggregator
     ports:
       - "88:8080"
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-sims-aggregator}
@@ -34,6 +40,8 @@ services:
     build: ../../sims-identity
     ports:
       - "67:8080"
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       Jwt__Key: ${JWT__KEY:-}
@@ -49,6 +57,8 @@ services:
     build: ../../sims-incidentManager
     ports:
       - "420:8080"
+    expose:
+      - "8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       OTEL_SERVICE_NAME: ${INC_OTEL_SERVICE_NAME:-sims-incidentManager}
@@ -70,7 +80,10 @@ services:
     build: ../../sims-stix-ingest
     ports:
       - "8080:8080"
+    expose:
+      - "8080"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - MongoDbSettings__ConnectionString=mongodb://${STIX_MONGO_USER}:${STIX_MONGO_PASSWORD}@dbstix:27017/?authSource=admin
       - MongoDbSettings__DatabaseName=stix_db
       - MongoDbSettings__CollectionName=stix_bundles
@@ -94,7 +107,8 @@ services:
     volumes:
       - ./dbidentity_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -111,7 +125,8 @@ services:
     volumes:
       - ./dbAggregator_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      test:
+        ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 5s
       timeout: 5s
       retries: 10

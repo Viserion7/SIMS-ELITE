@@ -1,0 +1,597 @@
+openapi: 3.1.1
+info:
+  title: sims-identity | v1
+  version: 1.0.0
+servers:
+  - url: http://localhost:67/
+paths:
+  /api/v1/Assignment/user/{id}/level/{levelid}:
+    post:
+      tags:
+        - Assignment
+      description: |-
+        Weist einem Benutzer ein Level zu.
+
+        Einschränkung:
+        - Nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: levelid
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      security:
+        - Bearer: []
+    delete:
+      tags:
+        - Assignment
+      description: |-
+        Entfernt ein Level von einem Benutzer.
+
+        Einschränkung:
+        - Nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: levelid
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      security:
+        - Bearer: []
+  /api/v1/Auth/login:
+    post:
+      tags:
+        - Auth
+      description: Meldet einen Benutzer an.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /api/v1/Auth/me:
+    get:
+      tags:
+        - Auth
+      description: Gibt den aktuell angemeldeten Benutzer zurück.
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/UserAuthorized"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthorized"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/UserAuthorized"
+      security:
+        - Bearer: []
+  /api/v1/Auth/refresh:
+    post:
+      tags:
+        - Auth
+      description: Erstellt ein neues Zugriffstoken.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+  /api/v1/Auth/logout:
+    post:
+      tags:
+        - Auth
+      description: Revoken den RefreshToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/RefreshTokenRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+      security:
+        - Bearer: []
+  /api/v1/Categories/categories:
+    get:
+      tags:
+        - Categories
+      description: |-
+        Gibt alle Kategorien zurück.
+
+        Einschränkung:
+        - Jeder angemeldete Benutzer
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+      security:
+        - Bearer: []
+  /api/v1/User:
+    post:
+      tags:
+        - User
+      description: |-
+        Legt einen neuen Benutzer an.
+
+        Einschränkung:
+        - Nur Administratoren
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/CreateUserDto"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserDto"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/CreateUserDto"
+      security:
+        - Bearer: []
+    get:
+      tags:
+        - User
+      description: |-
+        Gibt alle Benutzer zurück.
+
+        Einschränkung:
+        - Nur Administratoren
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      security:
+        - Bearer: []
+  /api/v1/User/{id}:
+    get:
+      tags:
+        - User
+      description: >-
+        Gibt die Daten eines Benutzers zurück. Wenn kein Benutzer mit dieser ID
+        existiert, wird 404 zurückgegeben.
+
+
+        Einschränkung:
+
+        - Eigene Daten: erlaubt
+
+        - Andere Benutzer: nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/UserDto"
+      security:
+        - Bearer: []
+    put:
+      tags:
+        - User
+      description: |-
+        Ändert die Daten eines Benutzers.
+
+        Einschränkung:
+        - Nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+      security:
+        - Bearer: []
+    delete:
+      tags:
+        - User
+      description: |-
+        Markiert einen Benutzer als gelöscht.
+
+        Einschränkung:
+        - Nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+      security:
+        - Bearer: []
+  /api/v1/User/{id}/details:
+    get:
+      tags:
+        - User
+      description: |-
+        Gibt einen Benutzer mit seinen Levels und Kategorien zurück.
+
+        Einschränkung:
+        - Eigene Daten: erlaubt
+        - Andere Benutzer: nur Administratoren
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      security:
+        - Bearer: []
+  /api/v1/User/toNotify:
+    get:
+      tags:
+        - User
+      description: Gibts alle Emails an die im Escalationsfall geschickt werden soll.
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsersToNotify"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsersToNotify"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UsersToNotify"
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        name:
+          type: string
+        description:
+          type: string
+        levelId:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+    CreateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Level:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        name:
+          type: string
+        categorys:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+    RefreshTokenRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    UpdateUserDto:
+      type: object
+      properties:
+        email:
+          type:
+            - "null"
+            - string
+        password:
+          type:
+            - "null"
+            - string
+        is_deleted:
+          type:
+            - "null"
+            - boolean
+        is_Admin:
+          type:
+            - "null"
+            - boolean
+        is_ToNotify:
+          type:
+            - "null"
+            - boolean
+    User:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        email:
+          type: string
+        password_hash:
+          type: string
+        is_deleted:
+          type: boolean
+        is_Admin:
+          type: boolean
+        is_ToNotify:
+          type: boolean
+        levels:
+          type: array
+          items:
+            $ref: "#/components/schemas/Level"
+    UserAuthorized:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        email:
+          type: string
+        authenticated:
+          type: boolean
+    UserDto:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        email:
+          type: string
+        is_deleted:
+          type: boolean
+        is_Admin:
+          type: boolean
+        is_ToNotify:
+          type: boolean
+    UsersToNotify:
+      type: object
+      properties:
+        id:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - integer
+            - string
+          format: int32
+        email:
+          type: string
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+  - name: Assignment
+  - name: Auth
+  - name: Categories
+  - name: User

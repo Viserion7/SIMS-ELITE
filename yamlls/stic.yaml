@@ -1,0 +1,31 @@
+openapi: 3.1.1
+info:
+  title: sims-stix-ingest | v1
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/
+paths:
+  /api/v1/Stix:
+    put:
+      tags:
+        - Stix
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JsonElement"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/JsonElement"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/JsonElement"
+        required: true
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    JsonElement: {}
+tags:
+  - name: Stix
