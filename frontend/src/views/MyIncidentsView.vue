@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useIncidentsQuery } from '@/composables/queries/useIncidentQueries'
+import { useIncidentsQuery, useDeleteIncidentMutation } from '@/composables/queries/useIncidentQueries'
 import { useCurrentUserQuery } from '@/composables/queries/useAuthQueries'
 import { useMyCategories } from '@/composables/useMyCategories'
 import { useAuthStore } from '@/stores/auth'
@@ -11,9 +11,15 @@ import EmptyState from '@/components/EmptyState.vue'
 import IncidentCard from '@/components/IncidentCard.vue'
 import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const confirm = useConfirm()
+const toast = useToast()
+const deleteMutation = useDeleteIncidentMutation()
+
 const { data: userDetails } = useCurrentUserQuery()
 const allowedTypes = useMyCategories()
 
@@ -26,23 +32,21 @@ const { data: rawIncidents, isPending, isError } = useIncidentsQuery(page, count
 const allLoadedIncidents = ref<Incident[]>([])
 const hasMoreToLoad = ref(true)
 
-// Wir hängen neue Incidents an, sobald sie geladen sind
-// Da useIncidentsQuery reaktiv ist, müssen wir auf Änderungen reagieren
-import { watch } from 'vue'
 watch(rawIncidents, (newIncidents) => {
   if (newIncidents) {
     if (newIncidents.length < count.value) {
-      hasMoreToLoad.value = false // Wenn das Backend weniger liefert, als angefragt, sind wir am Ende
+      hasMoreToLoad.value = false
     }
-    
-    // Vermeide Duplikate beim Nachladen
-    const newItems = newIncidents.filter(n => !allLoadedIncidents.value.some(o => o.id === n.id))
-    allLoadedIncidents.value.push(...newItems)
+    if (page.value === 0) {
+      allLoadedIncidents.value = [...newIncidents]
+    } else {
+      const newItems = newIncidents.filter(n => !allLoadedIncidents.value.some(o => o.id === n.id))
+      allLoadedIncidents.value.push(...newItems)
+    }
   }
 }, { immediate: true })
 
 const filteredIncidents = computed(() => {
-  // Wenn der Benutzer Admin ist ODER (noch) keine spezifischen Kategorien zugewiesen sind: Alle Vorfälle anzeigen
   if (authStore.isAdmin || !allowedTypes.value.size) {
     return allLoadedIncidents.value
   }
@@ -56,6 +60,36 @@ const loadMore = () => {
 
 const goToDetail = (incident: Incident) => {
   router.push(`/incidents/${incident.id}`)
+}
+
+const handleDeleteIncident = (incident: Incident) => {
+  confirm.require({
+    message: `Möchtest du den Vorfall "${incident.name || incident.id}" wirklich als gesehen markieren? Er wird danach aus deiner Liste ausgeblendet.`,
+    header: 'Vorfall als gesehen markieren',
+    icon: 'pi pi-check-circle',
+    acceptLabel: 'Als gesehen markieren',
+    rejectLabel: 'Abbrechen',
+    acceptClass: 'p-button-success',
+    accept: async () => {
+      try {
+        await deleteMutation.mutateAsync(incident.id)
+        allLoadedIncidents.value = allLoadedIncidents.value.filter(i => i.id !== incident.id)
+        toast.add({
+          severity: 'success',
+          summary: 'Als gesehen markiert',
+          detail: 'Der Vorfall wurde erfolgreich als gesehen markiert.',
+          life: 3000,
+        })
+      } catch (err: any) {
+        toast.add({
+          severity: 'error',
+          summary: 'Fehler',
+          detail: err?.message || 'Konnte nicht als gesehen markiert werden.',
+          life: 4000,
+        })
+      }
+    },
+  })
 }
 </script>
 
@@ -96,6 +130,7 @@ const goToDetail = (incident: Incident) => {
           :incident="incident" 
           highlighted
           @click="goToDetail"
+          @delete="handleDeleteIncident"
         />
         
         <!-- Skeletons while loading -->

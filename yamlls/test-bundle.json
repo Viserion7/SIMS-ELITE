@@ -1,60 +1,351 @@
 {
   "type": "bundle",
-  "id": "bundle--5d0092c5-5f74-4287-9642-33f4c2544f99",
+  "id": "bundle--9d5b12ef-1a42-4f3b-b27e-8c33a6e9d110",
   "objects": [
     {
-      "type": "indicator",
+      "type": "incident",
       "spec_version": "2.1",
-      "id": "indicator--8e2e2d2b-17d4-4cbf-938f-98ee46b3cd3f",
-      "created": "2023-10-01T08:00:00.000Z",
-      "modified": "2023-10-01T08:00:00.000Z",
-      "name": "Phishing-Domain erkannt",
-      "description": "Dieser Indikator verweist auf eine schädliche Domain, die für Phishing-Kampagnen (Credential Harvesting) genutzt wird.",
-      "indicator_types": ["malicious-activity"],
-      "pattern": "[domain-name:value = 'secure-login-update.com']",
-      "pattern_type": "stix",
-      "valid_from": "2023-10-01T08:00:00Z"
+      "id": "incident--0191ebc2-6f23-7182-8201-9a74288b2011",
+      "created": "2026-09-18T08:15:00.000Z",
+      "modified": "2026-09-18T08:15:00.000Z",
+      "name": "Kritischer Ransomware-Befall im internen Rechenzentrum",
+      "description": "Mehrere zentrale Virtualisierungshosts und Active Directory Domain Controller wurden verschlüsselt. Eine Lösegeldforderung über 15 BTC wurde auf den Desktop-Systemen hinterlassen.",
+      "severity": "high"
+    },
+    {
+      "type": "incident",
+      "spec_version": "2.1",
+      "id": "incident--0191ebc3-9a41-7890-a302-8f192b45e022",
+      "created": "2026-09-17T14:30:00.000Z",
+      "modified": "2026-09-17T14:30:00.000Z",
+      "name": "Verdächtige Datenexfiltration über DNS-Tunneling",
+      "description": "Überwachungsalarme des IDS/IPS verzeichnen ungewöhnlich hohes DNS-Query-Volumen mit Base64-kodierten TXT-Anfragen an externe Nameserver. Verdacht auf sensiblen Kundendaten-Abfluss.",
+      "severity": "medium"
+    },
+    {
+      "type": "incident",
+      "spec_version": "2.1",
+      "id": "incident--0191ebc4-5412-7011-8903-bb4433221133",
+      "created": "2026-09-16T19:45:00.000Z",
+      "modified": "2026-09-16T19:45:00.000Z",
+      "name": "Gezielte Executive-Spearphishing Kampagne",
+      "description": "Führungskräfte der Geschäftsleitung erhielten personalisierte E-Mails mit gefälschten DocuSign-Links zum Abgreifen von Microsoft 365 MFA-Session-Tokens (AiTM-Phishing).",
+      "severity": "medium"
+    },
+    {
+      "type": "incident",
+      "spec_version": "2.1",
+      "id": "incident--0191ebc5-1122-7334-9904-ff6655443322",
+      "created": "2026-09-15T11:00:00.000Z",
+      "modified": "2026-09-15T11:00:00.000Z",
+      "name": "DDoS-Angriff auf das Kunden-Webportal",
+      "description": "Volumetrischer SYN-Flood und HTTP/2 Rapid Reset Angriff gegen das öffentliche Web-Portal. Antwortzeiten stiegen temporär über 25 Sekunden.",
+      "severity": "low"
+    },
+    {
+      "type": "incident",
+      "spec_version": "2.1",
+      "id": "incident--0191ebc6-9988-7766-8805-aa1122334455",
+      "created": "2026-09-14T07:20:00.000Z",
+      "modified": "2026-09-14T07:20:00.000Z",
+      "name": "Supply-Chain Schwachstelle in npm-Abhängigkeit",
+      "description": "In einer Drittanbieter-Bibliothek des Frontend-Buildprozesses wurde ein bösartiger Keylogger-Payload identifiziert. Build-Pipeline wurde unverzüglich isoliert.",
+      "severity": "high"
     },
     {
       "type": "malware",
       "spec_version": "2.1",
-      "id": "malware--31b940d4-6f7f-459a-80ea-9c1f17b5891b",
-      "created": "2023-10-01T08:30:00.000Z",
-      "modified": "2023-10-01T08:30:00.000Z",
-      "name": "Ransomware XYZ",
-      "description": "Eine Ransomware-Variante, die Dateien verschlüsselt und eine Erpressernachricht hinterlässt.",
-      "is_family": false
+      "id": "malware--11111111-2222-3333-4444-555555555555",
+      "created": "2026-09-18T08:20:00.000Z",
+      "modified": "2026-09-18T08:20:00.000Z",
+      "name": "BlackByte 3.0 Ransomware",
+      "description": "Moderne Go-basierte Ransomware-Familie mit Bring-Your-Own-Vulnerable-Driver (BYOVD) Technik zur Deaktivierung von EDR-Agenten.",
+      "is_family": true,
+      "malware_types": ["ransomware"]
+    },
+    {
+      "type": "malware",
+      "spec_version": "2.1",
+      "id": "malware--22222222-3333-4444-5555-666666666666",
+      "created": "2026-09-17T14:35:00.000Z",
+      "modified": "2026-09-17T14:35:00.000Z",
+      "name": "Cobalt Strike Beacon",
+      "description": "Flexibles Post-Exploitation-Framework zur C2-Kommunikation und Laterale-Bewegung im internen Netzwerk.",
+      "is_family": true,
+      "malware_types": ["backdoor", "trojan"]
+    },
+    {
+      "type": "malware",
+      "spec_version": "2.1",
+      "id": "malware--33333333-4444-5555-6666-777777777777",
+      "created": "2026-09-16T19:50:00.000Z",
+      "modified": "2026-09-16T19:50:00.000Z",
+      "name": "Evilginx2 AiTM Kit",
+      "description": "Adversary-in-the-Middle Reverse-Proxy zur Umgehung von 2FA-Mechanismen durch das Abfangen von Session-Cookies.",
+      "is_family": false,
+      "malware_types": ["credential-harvester"]
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--44444444-5555-6666-7777-888888888888",
+      "created": "2026-09-18T08:25:00.000Z",
+      "modified": "2026-09-18T08:25:00.000Z",
+      "name": "C2 Server IP 194.26.29.114",
+      "description": "Hardcoded Command & Control IP in der Malware-Konfiguration zur Schlüsselübermittlung.",
+      "pattern": "[ipv4-addr:value = '194.26.29.114']",
+      "pattern_type": "stix"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--55555555-6666-7777-8888-999999999999",
+      "created": "2026-09-16T19:55:00.000Z",
+      "modified": "2026-09-16T19:55:00.000Z",
+      "name": "Phishing-Domain secure-docusign-auth-portal.com",
+      "description": "Gefälschte Anmeldeseite mit täuschend echtem Look-and-Feel zur Entwendung von Microsoft Zugangsdaten.",
+      "pattern": "[domain-name:value = 'secure-docusign-auth-portal.com']",
+      "pattern_type": "stix"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--66666666-7777-8888-9999-000000000000",
+      "created": "2026-09-18T08:30:00.000Z",
+      "modified": "2026-09-18T08:30:00.000Z",
+      "name": "SHA256 Payload Hash: a8b3f4c1...",
+      "description": "Kryptographischer Prüfwert der bösartigen ausführbaren Datei (blackbyte_loader.exe).",
+      "pattern": "[file:hashes.'SHA-256' = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855']",
+      "pattern_type": "stix"
+    },
+    {
+      "type": "threat-actor",
+      "spec_version": "2.1",
+      "id": "threat-actor--77777777-8888-9999-0000-111111111111",
+      "created": "2026-09-18T08:00:00.000Z",
+      "modified": "2026-09-18T08:00:00.000Z",
+      "name": "UNC1756 (Financially Motivated Group)",
+      "description": "Erfahrene Cybercrime-Gruppe, spezialisiert auf Big Game Hunting und doppelte Erpressung von Unternehmen im DACH-Raum.",
+      "threat_actor_types": ["crime-syndicate"]
+    },
+    {
+      "type": "threat-actor",
+      "spec_version": "2.1",
+      "id": "threat-actor--88888888-9999-0000-1111-222222222222",
+      "created": "2026-09-16T19:00:00.000Z",
+      "modified": "2026-09-16T19:00:00.000Z",
+      "name": "Storm-0324 Phishing Broker",
+      "description": "Initial Access Broker, der gestohlene Zugangsdaten und kompromittierte Session-Tokens in Darknet-Foren weiterverkauft.",
+      "threat_actor_types": ["crime-syndicate"]
     },
     {
       "type": "vulnerability",
       "spec_version": "2.1",
-      "id": "vulnerability--0c7b5b88-8ff7-4a4d-aa9d-feb398cd0061",
-      "created": "2023-10-02T10:15:00.000Z",
-      "modified": "2023-10-02T10:15:00.000Z",
-      "name": "CVE-2023-12345",
-      "description": "Eine SQL-Injection Schwachstelle im Login-Formular."
+      "id": "vulnerability--99999999-0000-1111-2222-333333333333",
+      "created": "2026-09-18T08:05:00.000Z",
+      "modified": "2026-09-18T08:05:00.000Z",
+      "name": "CVE-2023-34362 (MOVEit Transfer SQLi)",
+      "description": "Kritische SQL-Injection-Schwachstelle im Web-Interface von MOVEit Transfer, die Remote-Codeausführung erlaubt.",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2023-34362"
+        }
+      ]
+    },
+    {
+      "type": "vulnerability",
+      "spec_version": "2.1",
+      "id": "vulnerability--aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "created": "2026-09-17T14:00:00.000Z",
+      "modified": "2026-09-17T14:00:00.000Z",
+      "name": "CVE-2024-21413 (Microsoft Outlook RCE)",
+      "description": "Moniker-Link Sicherheitslücke in Microsoft Outlook zur Umgehung von Protected View und NTLM-Hash-Leakage.",
+      "external_references": [
+        {
+          "source_name": "cve",
+          "external_id": "CVE-2024-21413"
+        }
+      ]
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "created": "2026-09-18T08:10:00.000Z",
+      "modified": "2026-09-18T08:10:00.000Z",
+      "name": "T1486 - Data Encrypted for Impact",
+      "description": "Angreifer verschlüsseln Daten auf Zielsystemen zur Unterbrechung des Betriebs und Erpressung von Lösegeld."
+    },
+    {
+      "type": "attack-pattern",
+      "spec_version": "2.1",
+      "id": "attack-pattern--cccccccc-dddd-eeee-ffff-000000000000",
+      "created": "2026-09-16T19:10:00.000Z",
+      "modified": "2026-09-16T19:10:00.000Z",
+      "name": "T1566.002 - Spearphishing Link",
+      "description": "Zusenden schädlicher Hyperlinks per E-Mail zur Ausführung von Exploits oder Erbeutung von Login-Daten."
+    },
+    {
+      "type": "course-of-action",
+      "spec_version": "2.1",
+      "id": "course-of-action--dddddddd-eeee-ffff-0000-111111111111",
+      "created": "2026-09-18T08:40:00.000Z",
+      "modified": "2026-09-18T08:40:00.000Z",
+      "name": "Netzwerksegmentierung & Offline-Backups aktivieren",
+      "description": "Sofortige Trennung der Hypervisor-Management-Netzwerke vom allgemeinen Office-VLAN und Einspielen verifizierter Immutable-Snapshots."
+    },
+    {
+      "type": "course-of-action",
+      "spec_version": "2.1",
+      "id": "course-of-action--eeeeeeee-ffff-0000-1111-222222222222",
+      "created": "2026-09-16T20:00:00.000Z",
+      "modified": "2026-09-16T20:00:00.000Z",
+      "name": "FIDO2 / Passkeys erzwingen",
+      "description": "Umstellung aller Benutzerkonten auf phishing-resistente FIDO2-Hardwaretokens zur vollständigen Verhinderung von AiTM-Angriffen."
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--44298a74-ba52-4f0c-87a9-8688481358bd",
-      "created": "2023-10-03T09:00:00.000Z",
-      "modified": "2023-10-03T09:00:00.000Z",
+      "id": "relationship--00010001-0001-0001-0001-000000000001",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "incident--0191ebc2-6f23-7182-8201-9a74288b2011",
+      "target_ref": "malware--11111111-2222-3333-4444-555555555555",
+      "description": "Beim Ransomware-Befall wurde BlackByte 3.0 zur Datenverschlüsselung eingesetzt."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000002",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
       "relationship_type": "indicates",
-      "source_ref": "indicator--8e2e2d2b-17d4-4cbf-938f-98ee46b3cd3f",
-      "target_ref": "malware--31b940d4-6f7f-459a-80ea-9c1f17b5891b",
-      "description": "Die Domain wurde verwendet, um Ransomware herunterzuladen."
+      "source_ref": "indicator--44444444-5555-6666-7777-888888888888",
+      "target_ref": "malware--11111111-2222-3333-4444-555555555555",
+      "description": "Die IP-Adresse dient als zentraler C2-Server der BlackByte Malware."
     },
     {
       "type": "relationship",
       "spec_version": "2.1",
-      "id": "relationship--9a8b7c6d-5e4f-3a2b-1c0d-8e7f6a5b4c3d",
-      "created": "2023-10-04T11:00:00.000Z",
-      "modified": "2023-10-04T11:00:00.000Z",
+      "id": "relationship--00010001-0001-0001-0001-000000000003",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--66666666-7777-8888-9999-000000000000",
+      "target_ref": "malware--11111111-2222-3333-4444-555555555555",
+      "description": "Der SHA-256 Hash entspricht dem BlackByte Verschlüsselungs-Payload."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000004",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
       "relationship_type": "targets",
-      "source_ref": "malware--31b940d4-6f7f-459a-80ea-9c1f17b5891b",
-      "target_ref": "vulnerability--0c7b5b88-8ff7-4a4d-aa9d-feb398cd0061",
-      "description": "Ransomware nutzt die SQL-Injection Schwachstelle aus."
+      "source_ref": "malware--11111111-2222-3333-4444-555555555555",
+      "target_ref": "vulnerability--99999999-0000-1111-2222-333333333333",
+      "description": "Initialer Netzwerkzugang erfolgte über die MOVEit SQL-Injection Schwachstelle."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000005",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
+      "relationship_type": "attributed-to",
+      "source_ref": "incident--0191ebc2-6f23-7182-8201-9a74288b2011",
+      "target_ref": "threat-actor--77777777-8888-9999-0000-111111111111",
+      "description": "Forensische Indizien ordnen den Vorfall der Cybercrime-Gruppe UNC1756 zu."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000006",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "malware--11111111-2222-3333-4444-555555555555",
+      "target_ref": "attack-pattern--bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "description": "BlackByte nutzt die Taktik T1486 zur Erpressung."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000007",
+      "created": "2026-09-18T08:50:00.000Z",
+      "modified": "2026-09-18T08:50:00.000Z",
+      "relationship_type": "mitigates",
+      "source_ref": "course-of-action--dddddddd-eeee-ffff-0000-111111111111",
+      "target_ref": "incident--0191ebc2-6f23-7182-8201-9a74288b2011",
+      "description": "Segmentierung und Backups stoppen die weitere Ausbreitung."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000008",
+      "created": "2026-09-16T20:10:00.000Z",
+      "modified": "2026-09-16T20:10:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "incident--0191ebc4-5412-7011-8903-bb4433221133",
+      "target_ref": "malware--33333333-4444-5555-6666-777777777777",
+      "description": "Spearphishing nutzte Evilginx2 als AiTM-Plattform."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000009",
+      "created": "2026-09-16T20:10:00.000Z",
+      "modified": "2026-09-16T20:10:00.000Z",
+      "relationship_type": "indicates",
+      "source_ref": "indicator--55555555-6666-7777-8888-999999999999",
+      "target_ref": "incident--0191ebc4-5412-7011-8903-bb4433221133",
+      "description": "Die Fake-Domain wurde in den Phishing-Mails als Link versendet."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000010",
+      "created": "2026-09-16T20:10:00.000Z",
+      "modified": "2026-09-16T20:10:00.000Z",
+      "relationship_type": "attributed-to",
+      "source_ref": "incident--0191ebc4-5412-7011-8903-bb4433221133",
+      "target_ref": "threat-actor--88888888-9999-0000-1111-222222222222",
+      "description": "Die Kampagne wurde von Storm-0324 betrieben."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000011",
+      "created": "2026-09-16T20:10:00.000Z",
+      "modified": "2026-09-16T20:10:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "threat-actor--88888888-9999-0000-1111-222222222222",
+      "target_ref": "attack-pattern--cccccccc-dddd-eeee-ffff-000000000000",
+      "description": "Angreifer nutzt T1566.002 zur Köderung der Opfer."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000012",
+      "created": "2026-09-16T20:10:00.000Z",
+      "modified": "2026-09-16T20:10:00.000Z",
+      "relationship_type": "mitigates",
+      "source_ref": "course-of-action--eeeeeeee-ffff-0000-1111-222222222222",
+      "target_ref": "attack-pattern--cccccccc-dddd-eeee-ffff-000000000000",
+      "description": "FIDO2-Tokens verhindern Session-Hijacking zuverlässig."
+    },
+    {
+      "type": "relationship",
+      "spec_version": "2.1",
+      "id": "relationship--00010001-0001-0001-0001-000000000013",
+      "created": "2026-09-17T14:40:00.000Z",
+      "modified": "2026-09-17T14:40:00.000Z",
+      "relationship_type": "uses",
+      "source_ref": "incident--0191ebc3-9a41-7890-a302-8f192b45e022",
+      "target_ref": "malware--22222222-3333-4444-5555-666666666666",
+      "description": "Cobalt Strike Beacon wurde für die DNS-Exfiltration verwendet."
     }
   ]
 }
