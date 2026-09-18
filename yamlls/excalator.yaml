@@ -1,0 +1,39 @@
+openapi: 3.1.1
+info:
+  title: sims-incidentManager | v1
+  version: 1.0.0
+servers:
+  - url: http://localhost:420/
+paths:
+  /api/v1/Eskalation:
+    post:
+      tags:
+        - Eskalation
+      description: Escalate Incident and send real email to admins via SMTP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EscalateRequestDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/EscalateRequestDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/EscalateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    EscalateRequestDto:
+      type: object
+      properties:
+        incidentId:
+          type: string
+          format: uuid
+        message:
+          type: string
+tags:
+  - name: Eskalation

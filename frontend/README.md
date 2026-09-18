@@ -1,6 +1,6 @@
 # Frontend Architektur & API Guide
 
-Kompakte Übersicht über Konfiguration, Backend-Kopplung und Ordnerstruktur.
+Kompakte Übersicht über Konfiguration, Backend-Kopplung, Auth/Bearer-Token und Ordnerstruktur.
 
 ---
 
@@ -27,60 +27,89 @@ Kompakte Übersicht über Konfiguration, Backend-Kopplung und Ordnerstruktur.
 
 ---
 
-## 2. Backend-Routing Übersicht
+## 2. Backend-Routing & Auth Übersicht
 
 Alle Aufrufe aus dem Frontend laufen über relative Pfade (Same-Origin):
 
-| Service | Frontend-Pfad | Lokaler Vite-Proxy (`.env`) | Docker-Netzwerk (Nginx Upstream) |
-| :--- | :--- | :--- | :--- |
-| **Identity** | `/api/identity/*` | `VITE_IDENTITY_URL` (Port 67) | `http://identity:8080` |
-| **Aggregator** | `/api/aggregator/*` | `VITE_AGGREGATOR_URL` (Port 88) | `http://aggregator:8080` |
-| **Incident Manager** | `/api/incident-manager/*` | `VITE_INCIDENT_MANAGER_URL` (Port 420) | `http://incident-manager:8080` |
-| **STIX Ingest** | `/api/stix/*` | `VITE_STIX_URL` (Port 8080) | `http://sims-stix-ingest:8080` |
+| Service | Frontend-Pfad | Lokaler Vite-Proxy (`.env`) | Docker-Netzwerk | Auth / Bearer |
+| :--- | :--- | :--- | :--- | :--- |
+| **Identity** | `/api/identity/*` | `VITE_IDENTITY_URL` (Port 67) | `http://identity:8080` | **Ja** (JWT Bearer für User, Me, Categories, Assignments) |
+| **Aggregator** | `/api/aggregator/*` | `VITE_AGGREGATOR_URL` (Port 88) | `http://aggregator:8080` | Nein (öffentlich / intern) |
+| **Incident Manager** | `/api/incident-manager/*` | `VITE_INCIDENT_MANAGER_URL` (Port 420) | `http://incident-manager:8080` | Nein (öffentlich / intern) |
+| **STIX Ingest** | `/api/stix/*` | `VITE_STIX_URL` (Port 8080) | `http://sims-stix-ingest:8080` | Nein (öffentlich / intern) |
 
 ---
 
-## 3. Ordnerstruktur: `src/api` vs. `src/composables/queries`
+## 3. Bearer-Token & Payload-Regeln
 
-### `src/api/` (HTTP-Client Layer)
-- **Zweck**: Reine HTTP-Kommunikation (`fetch`) mit den Microservices.
-- **Inhalt (`src/api/client.ts`)**:
-  - `apiClient(endpoint, options, service)`: Zentraler Fetch-Wrapper (JSON-Handling, Error-Handling, Auth-Header).
-  - Vorkonfigurierte Service-Clients:
-    - `identityApiClient(...)`
-    - `aggregatorApiClient(...)`
-    - `incidentManagerApiClient(...)`
-    - `stixApiClient(...)`
-- **Umgang**: Keine UI-Logik oder State-Handling hier; nur API-Aufrufe und DTO-Typen.
+### Automatischer Bearer Token
+- Der zentrale Client in `src/api/client.ts` prüft automatisch bei jedem Request, ob ein Token im `useAuthStore` bzw. `localStorage` vorhanden ist.
+- Ist ein Token da und `skipAuth !== true`, wird der Header `Authorization: Bearer <accessToken>` automatisch injiziert.
+- Bei `/api/v1/Auth/login`, `/api/v1/Auth/refresh` und `/api/v1/User/toNotify` wird `skipAuth: true` gesetzt.
 
-### `src/composables/queries/` (Query- & State Layer)
-- **Zweck**: Server-State-Management mit `@tanstack/vue-query` (Caching, Loading/Error States, Refetching).
-- **Inhalt**: Vue-Composables (`use...Query`, `use...Mutation`).
-- **Umgang / Best Practice**:
-  - Für jede Backend-Ressource ein Composable erstellen (z. B. `useIncidentsQuery.ts`).
-  - In `queryFn` den passenden Client aus `src/api/client.ts` aufrufen:
-    ```ts
-    import { useQuery } from '@tanstack/vue-query'
-    import { aggregatorApiClient } from '@/api/client'
-
-    export function useExampleQuery() {
-      return useQuery({
-        queryKey: ['example'],
-        queryFn: () => aggregatorApiClient('/example'), // ruft /api/aggregator/example auf
-      })
-    }
-    ```
-  - In Vue-Komponenten ausschließlich Composables importieren:
-    ```ts
-    const { data, isLoading, error } = useExampleQuery()
-    ```
-- **Regel**: Komponenten rufen niemals `fetch` oder `apiClient` direkt auf, sondern nutzen immer die Composables.
+### Wichtige Payload-Eigenheiten der Backends:
+- **Login (`POST /api/v1/Auth/login`)**:
+  - Request: `{ email: string, password: string }`
+  - Response: `{ accessToken: string, refreshToken: string }`
+- **STIX Ingest (`PUT /api/v1/Stix`)**:
+  - Request: JSON-Objekt mit `"type": "bundle"`, `"id": "bundle--..."` und `"objects": [{ id, type, ... }]`
+  - Validierungshelfer: `validateStixBundle(data)` in `src/composables/queries` oder `src/api`
+- **Eskalation (`POST /api/v1/Eskalation`)**:
+  - Request: `{ incidentId: string, message: string }`
+- **User Update (`PUT /api/v1/User/{id}`)**:
+  - Request: `{ email?, password?, is_deleted?, is_Admin?, is_ToNotify? }` (Admin Toggle!)
 
 ---
 
-## 4. Kurzanleitung: Neuen Endpunkt anbinden
+## 4. Ordnerstruktur: Types, API & TanStack Queries
 
-1. **Service identifizieren**: Welches Backend wird benötigt (z. B. Aggregator)?
-2. **Query anlegen**: Datei in `src/composables/queries/use<Name>Query.ts` erstellen.
-3. **Client aufrufen**: Den passenden Client (`aggregatorApiClient`, etc.) mit dem relativen Endpunkt ohne Service-Präfix aufrufen.
-4. **Verwenden**: Composable in der Vue-Komponente per `use...Query()` einbinden.
+### `src/types/` (TypeScript DTOs)
+- `auth.ts`, `identity.ts`, `aggregator.ts`, `incidentManager.ts`, `stix.ts`
+- Vollständige Typdefinitionen aller Request- und Response-Objekte.
+
+### `src/stores/auth.ts` (Pinia Auth Store)
+- Speichert `accessToken`, `refreshToken`, `currentUser` und `userDetails`.
+- Berechnet `isAuthenticated` und `isAdmin`.
+
+### `src/api/` (Domain API Services)
+Reine HTTP-Funktionen ohne Vue-Reaktivität:
+- `identityApi`: `login`, `getMe`, `getUsers`, `updateUser`, `assignLevel`, etc.
+- `aggregatorApi`: `getIncidents(page, count)`, `getIncidentById`, `getRelationshipsByIncident`, etc.
+- `incidentManagerApi`: `escalate({ incidentId, message })`
+- `stixApi`: `uploadStix(bundle)`, `validateStixBundle(bundle)`
+
+### `src/composables/queries/` (TanStack Query Hooks)
+Reaktives State-Management mit automatischem Caching und Invalidierung:
+- **`queryKeys.ts`**: Zentrale Factory zur Vermeidung von Typo-Strings im Cache.
+- **`useAuthQueries.ts`**: `useLoginMutation`, `useCurrentUserQuery`, `useLogoutMutation`
+- **`useUserQueries.ts`**: `useUsersQuery`, `useUserDetailsQuery`, `useUpdateUserMutation`, `useAssignLevelMutation`
+- **`useIncidentQueries.ts`**: `useIncidentsQuery`, `useIncidentDetailQuery`, `useIncidentRelationshipsQuery`
+- **`useEscalationQueries.ts`**: `useEscalateMutation`
+- **`useStixQueries.ts`**: `useStixUploadMutation` (invalidiert nach Upload automatisch Incidents-Cache!)
+
+---
+
+## 5. Anwendungsbeispiel in Vue-Komponenten
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useIncidentsQuery, useEscalateMutation } from '@/composables/queries'
+
+const page = ref(1)
+const count = ref(20)
+
+// Reaktives Abrufen mit TanStack Query (automatisch gecacht)
+const { data: incidents, isLoading, error } = useIncidentsQuery(page, count)
+
+// Eskalations-Mutation
+const { mutate: escalate, isPending: isEscalating } = useEscalateMutation()
+
+function handleEscalate(incidentId: string) {
+  escalate({
+    incidentId,
+    message: 'Kritischer Vorfall erfordert sofortige Prüfung!',
+  })
+}
+</script>
+```

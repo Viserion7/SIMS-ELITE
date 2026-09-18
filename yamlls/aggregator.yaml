@@ -1,0 +1,281 @@
+openapi: 3.1.1
+info:
+  title: sims-aggregator | v1
+  version: 1.0.0
+servers:
+  - url: http://localhost:88/
+paths:
+  /api/v1/Incidents/{id}:
+    get:
+      tags:
+        - Incidents
+      description: Get Incident data of an ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Incident"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+    delete:
+      tags:
+        - Incidents
+      description: Delete Incident data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+  /api/v1/Incidents/{page}/{count}:
+    get:
+      tags:
+        - Incidents
+      description: Get all Incident data
+      parameters:
+        - name: page
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: count
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Incident"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Incident"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Incident"
+  /api/v1/Incidents:
+    post:
+      tags:
+        - Incidents
+      description: Upload Incident data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateIncidentDto"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/CreateIncidentDto"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/CreateIncidentDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /api/v1/Relationship:
+    post:
+      tags:
+        - Relationship
+      description: Upload Relationship
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Relationship"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/Relationship"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/Relationship"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /api/v1/Relationship/{id}:
+    get:
+      tags:
+        - Relationship
+      description: Get Relationship by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+  /api/v1/Relationship/{page}/{count}:
+    get:
+      tags:
+        - Relationship
+      description: Get all Relationship data
+      parameters:
+        - name: page
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+        - name: count
+          in: path
+          required: true
+          schema:
+            pattern: ^-?(?:0|[1-9]\d*)$
+            type:
+              - integer
+              - string
+            format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+  /api/v1/Relationship/incident/{incidentId}:
+    get:
+      tags:
+        - Relationship
+      description: Get all relationships for a specific Incident UUID
+      parameters:
+        - name: incidentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Relationship"
+components:
+  schemas:
+    CreateIncidentDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        source_format:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        desc:
+          type: string
+    Incident:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        db_created_at:
+          type: string
+          format: date-time
+        is_deleted:
+          type: boolean
+        deleted_by:
+          pattern: ^-?(?:0|[1-9]\d*)$
+          type:
+            - "null"
+            - integer
+            - string
+          format: int32
+        source_format:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        desc:
+          type: string
+    Relationship:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        idFrom:
+          type: string
+          format: uuid
+        idTo:
+          type: string
+          format: uuid
+tags:
+  - name: Incidents
+  - name: Relationship

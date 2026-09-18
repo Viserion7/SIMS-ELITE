@@ -1,4 +1,4 @@
-const runtimeConfig = typeof window !== 'undefined' ? window.APP_CONFIG ?? {} : {}
+const runtimeConfig = typeof window !== 'undefined' ? (window.APP_CONFIG ?? {}) : {}
 
 export type ApiService = 'identity' | 'aggregator' | 'incidentManager' | 'stix'
 
@@ -9,10 +9,11 @@ export const aggregatorUrl =
   runtimeConfig.aggregatorUrl || import.meta.env.VITE_AGGREGATOR_URL || '/api/aggregator'
 
 export const incidentManagerUrl =
-  runtimeConfig.incidentManagerUrl || import.meta.env.VITE_INCIDENT_MANAGER_URL || '/api/incident-manager'
+  runtimeConfig.incidentManagerUrl ||
+  import.meta.env.VITE_INCIDENT_MANAGER_URL ||
+  '/api/incident-manager'
 
-export const stixUrl =
-  runtimeConfig.stixUrl || import.meta.env.VITE_STIX_URL || '/api/stix'
+export const stixUrl = runtimeConfig.stixUrl || import.meta.env.VITE_STIX_URL || '/api/stix'
 
 export const getBaseUrl = (service: ApiService): string => {
   switch (service) {
@@ -34,17 +35,14 @@ export const getApiUrl = (endpoint: string, service: ApiService = 'aggregator'):
   return `${baseUrl.replace(/\/$/, '')}${path}`
 }
 
-export const getIdentityApiUrl = (endpoint: string): string =>
-  getApiUrl(endpoint, 'identity')
+export const getIdentityApiUrl = (endpoint: string): string => getApiUrl(endpoint, 'identity')
 
-export const getAggregatorApiUrl = (endpoint: string): string =>
-  getApiUrl(endpoint, 'aggregator')
+export const getAggregatorApiUrl = (endpoint: string): string => getApiUrl(endpoint, 'aggregator')
 
 export const getIncidentManagerApiUrl = (endpoint: string): string =>
   getApiUrl(endpoint, 'incidentManager')
 
-export const getStixApiUrl = (endpoint: string): string =>
-  getApiUrl(endpoint, 'stix')
+export const getStixApiUrl = (endpoint: string): string => getApiUrl(endpoint, 'stix')
 
 export default {
   identityUrl,
