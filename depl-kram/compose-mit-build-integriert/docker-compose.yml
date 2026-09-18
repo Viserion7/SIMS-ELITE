@@ -56,6 +56,11 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT__KEY: ${OTEL_EXPORTER_OTLP_ENDPOINT__KEY:-}
       IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
       AGGREGATOR_URL: ${AGGREGATOR_URL:-http://aggregator:8080}
+      EMAIL_SERVER: ${EMAIL_SERVER:-}
+      EMAIL_PORT: ${EMAIL_PORT:-}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_SECRET: ${EMAIL_SECRET:-}
+
     depends_on:
       - identity
       - aggregator
