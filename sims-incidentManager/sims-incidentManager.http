@@ -1,0 +1,6 @@
+@sims_incidentManager_HostAddress = http://localhost:5240
+
+GET {{sims_incidentManager_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -4,8 +4,8 @@ services:
     ports:
       - "2000:80"
     environment:
-      IDENTITY_URL: ${IDENTITY_URL:-}
-      AGGREGATOR_URL: ${AGGREGATOR_URL:-}
+      IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
+      AGGREGATOR_URL: ${AGGREGATOR_URL:-http://aggregator:8080}
     depends_on:
       - aggregator
       - identity
@@ -17,12 +17,14 @@ services:
       - "88:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${AGGR_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_SERVICE_NAME: ${AGGR_OTEL_SERVICE_NAME:-sims-aggregator}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-http://localhost:4317}
+      OTEL_EXPORTER_OTLP_ENDPOINT__KEY: ${OTEL_EXPORTER_OTLP_ENDPOINT__KEY:-}
       POSTGRES_HOST: dbAggregator
-      POSTGRES_USER: ${AGGR_POSTGRES_USER:-}
-      POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD:-}
-      POSTGRES_DB: ${AGGR_POSTGRES_DB:-}
+      POSTGRES_USER: ${AGGR_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${AGGR_POSTGRES_DB:-aggregator}
+      IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
     depends_on:
       dbAggregator:
         condition: service_healthy
@@ -30,9 +32,35 @@ services:
 
   identity:
     image: ghcr.io/viserion7/sims-elite-identity:latest
+    ports:
+      - "67:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Jwt__Key: ${JWT__KEY:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT__url: ${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT__key: ${OTEL_EXPORTER_OTLP_ENDPOINT__KEY:-}
+      connectionString: "Host=dbidentity;Port=5432;Username=${ID_POSTGRES_USER};Password=${ID_POSTGRES_PASSWORD};Database=${ID_POSTGRES_DB}"
     depends_on:
       dbidentity:
         condition: service_healthy
+    restart: unless-stopped
+
+  incident-manager:
+    image: ghcr.io/viserion7/sims-elite-incident-manager:latest
+    ports:
+      - "420:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      OTEL_SERVICE_NAME: ${INC_OTEL_SERVICE_NAME:-sims-incidentManager}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-http://localhost:4317}
+      OTEL_EXPORTER_OTLP_ENDPOINT__KEY: ${OTEL_EXPORTER_OTLP_ENDPOINT__KEY:-}
+      IDENTITY_URL: ${IDENTITY_URL:-http://identity:8080}
+      AGGREGATOR_URL: ${AGGREGATOR_URL:-http://aggregator:8080}
+      EMAIL_SECRET: ${EMAIL_SECRET:-}
+      EMAIL_SERVER: ${EMAIL_SERVER:-}
+    depends_on:
+      - identity
+      - aggregator
     restart: unless-stopped
   
   sims-stix-ingest:
@@ -54,6 +82,8 @@ services:
 
   dbidentity:
     image: postgres:16
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_USER: ${ID_POSTGRES_USER}
       POSTGRES_PASSWORD: ${ID_POSTGRES_PASSWORD}
@@ -61,7 +91,7 @@ services:
     volumes:
       - ./dbidentity_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -69,6 +99,8 @@ services:
 
   dbAggregator:
     image: postgres:16
+    ports:
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${AGGR_POSTGRES_USER}
       POSTGRES_PASSWORD: ${AGGR_POSTGRES_PASSWORD}
@@ -76,7 +108,7 @@ services:
     volumes:
       - ./dbAggregator_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -103,11 +135,9 @@ services:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
     environment:
-      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
     depends_on:
       - frontend
     restart: unless-stopped
     profiles:
       - tunnel
-
-
