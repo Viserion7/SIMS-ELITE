@@ -29,19 +29,23 @@ public class AssignmentController : ControllerBase
     [EndpointDescription("Weist einem Benutzer ein Level zu.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<User>> LevelUserZuweisen(int id, int levelid)
     {
-        var user = await _context.User.
-            Where(user => user.id == id).FirstOrDefaultAsync();
+        var user = await _context.User
+            .Include(u => u.Levels)
+            .FirstOrDefaultAsync(u => u.id == id);
 
-        var level = await _context.Level.
-            Where(level => level.id == levelid).FirstOrDefaultAsync();
+        var level = await _context.Level
+            .FirstOrDefaultAsync(l => l.id == levelid);
 
         if (user == null || level == null)
         {
             return NotFound();
         }
 
-        user.Levels.Add(level);
-        await _context.SaveChangesAsync();
+        if (!user.Levels.Any(l => l.id == levelid))
+        {
+            user.Levels.Add(level);
+            await _context.SaveChangesAsync();
+        }
 
         return Ok(user);
     }
@@ -50,19 +54,21 @@ public class AssignmentController : ControllerBase
     [EndpointDescription("Entfernt ein Level von einem Benutzer.\n\nEinschränkung:\n- Nur Administratoren")]
     public async Task<ActionResult<User>> LevelVonUserLoeschen(int id, int levelid)
     {
-        var user = await _context.User.
-            Where(user => user.id == id).FirstOrDefaultAsync();
+        var user = await _context.User
+            .Include(u => u.Levels)
+            .FirstOrDefaultAsync(u => u.id == id);
 
-        var level = await _context.Level.
-            Where(level => level.id == levelid).FirstOrDefaultAsync();
-
-        if (user == null || level == null)
+        if (user == null)
         {
             return NotFound();
         }
 
-        user.Levels.Remove(level);
-        await _context.SaveChangesAsync();
+        var levelToRemove = user.Levels.FirstOrDefault(l => l.id == levelid);
+        if (levelToRemove != null)
+        {
+            user.Levels.Remove(levelToRemove);
+            await _context.SaveChangesAsync();
+        }
 
         return Ok(user);
     }
