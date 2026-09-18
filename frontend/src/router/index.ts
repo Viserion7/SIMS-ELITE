@@ -35,6 +35,12 @@ const router = createRouter({
       meta: { layout: AppLayout, requiresAuth: true },
     },
     {
+      path: '/graph',
+      name: 'graph',
+      component: () => import('@/views/GraphView.vue'),
+      meta: { layout: AppLayout, requiresAuth: true },
+    },
+    {
       path: '/incidents/all',
       name: 'incidents-all',
       component: () => import('@/views/AllIncidentsView.vue'),
