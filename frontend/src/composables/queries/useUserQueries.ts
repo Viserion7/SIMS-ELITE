@@ -42,6 +42,16 @@ export function useCategoriesQuery() {
   })
 }
 
+export function useLevelsQuery() {
+  const authStore = useAuthStore()
+
+  return useQuery({
+    queryKey: queryKeys.levels.list(),
+    queryFn: () => identityApi.getLevels(),
+    enabled: () => authStore.isAuthenticated,
+  })
+}
+
 export function useCreateUserMutation() {
   const queryClient = useQueryClient()
 

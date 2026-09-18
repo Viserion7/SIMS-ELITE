@@ -1,12 +1,13 @@
 import { stixApiClient } from './client'
-import type { StixBundle } from '@/types'
+import type { StixBundle, StixIngestResponse } from '@/types'
 
 export const stixApi = {
-  uploadStix: async (bundle: StixBundle | unknown): Promise<void> => {
-    await stixApiClient<void>('/api/v1/Stix', {
+  uploadStix: async (bundle: StixBundle | unknown): Promise<StixIngestResponse> => {
+    const res = await stixApiClient<StixIngestResponse>('/api/v1/Stix', {
       method: 'PUT',
       body: bundle,
     })
+    return res!
   },
 
   validateStixBundle: (data: unknown): { valid: boolean; error?: string } => {

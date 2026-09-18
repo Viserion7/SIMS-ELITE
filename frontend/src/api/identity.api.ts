@@ -9,6 +9,7 @@ import type {
   UpdateUserDto,
   UsersToNotify,
   Category,
+  Level,
 } from '@/types'
 
 export const identityApi = {
@@ -98,6 +99,13 @@ export const identityApi = {
   // Categories & Assignments
   getCategories: async (): Promise<Category[]> => {
     const res = await identityApiClient<Category[]>('/api/v1/Categories/categories', {
+      method: 'GET',
+    })
+    return res ?? []
+  },
+
+  getLevels: async (): Promise<Level[]> => {
+    const res = await identityApiClient<Level[]>('/api/v1/Levels', {
       method: 'GET',
     })
     return res ?? []

@@ -13,6 +13,10 @@ export const queryKeys = {
     all: ['categories'] as const,
     list: () => [...queryKeys.categories.all, 'list'] as const,
   },
+  levels: {
+    all: ['levels'] as const,
+    list: () => [...queryKeys.levels.all, 'list'] as const,
+  },
   incidents: {
     all: ['incidents'] as const,
     list: (page: number, count: number) =>
