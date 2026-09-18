@@ -15,7 +15,7 @@ public class Program
         // setup openTelemetry
         var serviceName_openTelemetry = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME") ?? "sims-aggregator";
         var endpoint_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT") ?? "http://localhost:4317";
-        var key_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+        var key_opentelemetry = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT__KEY");
 
         builder.Services.AddOpenTelemetry() // setup OpenTelemetry tracing
         .WithTracing(tpb =>
