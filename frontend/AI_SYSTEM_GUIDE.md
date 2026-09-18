@@ -165,6 +165,8 @@ src/
 
 ### 4.6 Admin: Benutzerverwaltung (`/admin/users`)
 * **Zugriff:** Geschützt durch `authStore.isAdmin`.
+* **Benutzer anlegen:** Über den Button „Neuer Benutzer“ im Header öffnet sich ein Dialog (`POST /api/v1/User`), der neue Accounts mit E-Mail und initialem Passwort anlegt.
+* **Benutzer bearbeiten (E-Mail & Passwort):** Über das Stift-Icon in der Spalte „Aktionen“ öffnet sich ein Dialog (`PUT /api/v1/User/{id}`), mit dem E-Mail-Adresse und/oder ein neues Passwort als Administrator aktualisiert werden können.
 * **DataTable Sortierung:** Besitzt `sortField="id" :sortOrder="1"`. **Wichtig:** Dadurch springen die Tabellenzeilen nicht, wenn Toggles betätigt werden und TanStack Query im Hintergrund refetcht.
 * **Rollen-Toggles:** Direktes Ändern von `is_Admin` und `is_ToNotify`.
 * **Soft-Delete & Wiederherstellung:**

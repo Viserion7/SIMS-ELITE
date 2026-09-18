@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useUsersQuery, useUpdateUserMutation, useDeleteUserMutation, useCreateUserMutation } from '@/composables/queries/useUserQueries'
+import type { User, UpdateUserDto } from '@/types'
 import PageHeader from '@/components/PageHeader.vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -21,6 +22,57 @@ const toast = useToast()
 const showCreateDialog = ref(false)
 const newEmail = ref('')
 const newPassword = ref('')
+
+const showEditDialog = ref(false)
+const editingUser = ref<User | null>(null)
+const editEmail = ref('')
+const editPassword = ref('')
+
+const openEditDialog = (user: User) => {
+  editingUser.value = user
+  editEmail.value = user.email
+  editPassword.value = ''
+  showEditDialog.value = true
+}
+
+const closeEditDialog = () => {
+  showEditDialog.value = false
+  editingUser.value = null
+  editEmail.value = ''
+  editPassword.value = ''
+}
+
+const handleUpdateUser = async () => {
+  if (!editingUser.value) return
+  if (!editEmail.value) {
+    toast.add({ severity: 'warn', summary: 'Eingabe unvollständig', detail: 'Bitte eine E-Mail-Adresse angeben.', life: 3000 })
+    return
+  }
+
+  const dto: UpdateUserDto = {}
+  if (editEmail.value !== editingUser.value.email) {
+    dto.email = editEmail.value
+  }
+  if (editPassword.value.trim().length > 0) {
+    dto.password = editPassword.value
+  }
+
+  if (Object.keys(dto).length === 0) {
+    closeEditDialog()
+    return
+  }
+
+  try {
+    await updateMutation.mutateAsync({
+      id: editingUser.value.id,
+      dto
+    })
+    toast.add({ severity: 'success', summary: 'Erfolg', detail: 'Benutzerdaten erfolgreich aktualisiert.', life: 3000 })
+    closeEditDialog()
+  } catch (error: any) {
+    toast.add({ severity: 'error', summary: 'Fehler', detail: error?.message || 'Update fehlgeschlagen.', life: 4000 })
+  }
+}
 
 const closeCreateDialog = () => {
   showCreateDialog.value = false
@@ -156,26 +208,36 @@ const handleRestore = async (userId: number) => {
           </template>
         </Column>
 
-        <Column header="Aktionen" style="width: 8rem; text-align: center">
+        <Column header="Aktionen" style="width: 10rem; text-align: center">
           <template #body="slotProps">
-            <Button 
-              v-if="!slotProps.data.is_deleted"
-              icon="pi pi-trash" 
-              severity="danger" 
-              text 
-              rounded
-              title="Benutzer löschen"
-              @click="handleDelete(slotProps.data.id)" 
-            />
-            <Button 
-              v-else
-              icon="pi pi-undo" 
-              severity="secondary" 
-              text 
-              rounded
-              title="Benutzer wiederherstellen"
-              @click="handleRestore(slotProps.data.id)" 
-            />
+            <div class="flex justify-content-center gap-1">
+              <Button 
+                icon="pi pi-pencil" 
+                severity="secondary" 
+                text 
+                rounded
+                title="Benutzer bearbeiten (E-Mail / Passwort)"
+                @click="openEditDialog(slotProps.data)" 
+              />
+              <Button 
+                v-if="!slotProps.data.is_deleted"
+                icon="pi pi-trash" 
+                severity="danger" 
+                text 
+                rounded
+                title="Benutzer löschen"
+                @click="handleDelete(slotProps.data.id)" 
+              />
+              <Button 
+                v-else
+                icon="pi pi-undo" 
+                severity="secondary" 
+                text 
+                rounded
+                title="Benutzer wiederherstellen"
+                @click="handleRestore(slotProps.data.id)" 
+              />
+            </div>
           </template>
         </Column>
       </DataTable>
@@ -228,6 +290,56 @@ const handleRestore = async (userId: number) => {
           icon="pi pi-check" 
           :loading="createMutation.isPending.value" 
           @click="handleCreateUser" 
+        />
+      </template>
+    </Dialog>
+
+    <!-- Dialog: Benutzer bearbeiten (E-Mail / Passwort) -->
+    <Dialog 
+      v-model:visible="showEditDialog" 
+      modal 
+      :header="`Benutzer bearbeiten: ${editingUser?.email || ''}`" 
+      :style="{ width: '420px' }"
+    >
+      <div class="create-user-form">
+        <div class="form-group mb-3">
+          <label for="edit-email" class="form-label">E-Mail-Adresse</label>
+          <InputText 
+            id="edit-email" 
+            v-model.trim="editEmail" 
+            type="email" 
+            class="w-full"
+            @keydown.enter="handleUpdateUser"
+          />
+        </div>
+
+        <div class="form-group mb-2">
+          <label for="edit-password" class="form-label">Neues Passwort (optional)</label>
+          <InputText 
+            id="edit-password" 
+            v-model="editPassword" 
+            type="password" 
+            placeholder="Leer lassen, um nicht zu ändern" 
+            class="w-full"
+            @keydown.enter="handleUpdateUser"
+          />
+          <small class="text-color-secondary mt-1">Nur ausfüllen, wenn das Passwort neu vergeben werden soll.</small>
+        </div>
+      </div>
+
+      <template #footer>
+        <Button 
+          label="Abbrechen" 
+          severity="secondary" 
+          text 
+          @click="closeEditDialog" 
+          :disabled="updateMutation.isPending.value"
+        />
+        <Button 
+          label="Speichern" 
+          icon="pi pi-check" 
+          :loading="updateMutation.isPending.value" 
+          @click="handleUpdateUser" 
         />
       </template>
     </Dialog>
