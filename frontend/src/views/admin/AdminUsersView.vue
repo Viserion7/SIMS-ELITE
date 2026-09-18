@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useUsersQuery, useUpdateUserMutation, useDeleteUserMutation } from '@/composables/queries/useUserQueries'
+import { useUsersQuery, useUpdateUserMutation, useDeleteUserMutation, useCreateUserMutation } from '@/composables/queries/useUserQueries'
 import PageHeader from '@/components/PageHeader.vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -8,11 +8,43 @@ import ToggleSwitch from 'primevue/toggleswitch'
 import Badge from 'primevue/badge'
 import Skeleton from 'primevue/skeleton'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputtext'
 import { useToast } from 'primevue/usetoast'
 
 const { data: users, isPending, isError } = useUsersQuery()
 const updateMutation = useUpdateUserMutation()
+const deleteMutation = useDeleteUserMutation()
+const createMutation = useCreateUserMutation()
 const toast = useToast()
+
+const showCreateDialog = ref(false)
+const newEmail = ref('')
+const newPassword = ref('')
+
+const closeCreateDialog = () => {
+  showCreateDialog.value = false
+  newEmail.value = ''
+  newPassword.value = ''
+}
+
+const handleCreateUser = async () => {
+  if (!newEmail.value || !newPassword.value) {
+    toast.add({ severity: 'warn', summary: 'Eingabe unvollständig', detail: 'Bitte E-Mail und Passwort eingeben.', life: 3000 })
+    return
+  }
+
+  try {
+    await createMutation.mutateAsync({
+      email: newEmail.value,
+      password: newPassword.value
+    })
+    toast.add({ severity: 'success', summary: 'Erfolg', detail: `Benutzer ${newEmail.value} erfolgreich angelegt.`, life: 3000 })
+    closeCreateDialog()
+  } catch (error: any) {
+    toast.add({ severity: 'error', summary: 'Fehler', detail: error?.message || 'Benutzer konnte nicht angelegt werden (evtl. existiert die E-Mail bereits).', life: 4000 })
+  }
+}
 
 const handleToggleNotify = async (userId: number, currentVal: boolean) => {
   try {
@@ -25,8 +57,6 @@ const handleToggleNotify = async (userId: number, currentVal: boolean) => {
     toast.add({ severity: 'error', summary: 'Fehler', detail: 'Update fehlgeschlagen.', life: 3000 })
   }
 }
-
-const deleteMutation = useDeleteUserMutation()
 
 const handleToggleAdmin = async (userId: number, currentVal: boolean) => {
   try {
@@ -67,7 +97,13 @@ const handleRestore = async (userId: number) => {
     <PageHeader 
       title="Benutzerverwaltung" 
       description="Verwalten Sie globale Berechtigungen und E-Mail-Benachrichtigungen für alle Mitarbeiter."
-    />
+    >
+      <Button 
+        label="Neuer Benutzer" 
+        icon="pi pi-user-plus" 
+        @click="showCreateDialog = true" 
+      />
+    </PageHeader>
 
     <div v-if="isError" class="error-msg">
       Fehler beim Laden der Benutzer.
@@ -144,6 +180,57 @@ const handleRestore = async (userId: number) => {
         </Column>
       </DataTable>
     </div>
+
+    <!-- Dialog: Neuen Benutzer anlegen -->
+    <Dialog 
+      v-model:visible="showCreateDialog" 
+      modal 
+      header="Neuen Benutzer anlegen" 
+      :style="{ width: '420px' }"
+    >
+      <div class="create-user-form">
+        <div class="form-group mb-3">
+          <label for="new-email" class="form-label">E-Mail-Adresse</label>
+          <InputText 
+            id="new-email" 
+            v-model.trim="newEmail" 
+            type="email" 
+            placeholder="z.B. mitarbeiter@firma.at" 
+            class="w-full"
+            autofocus
+            @keydown.enter="handleCreateUser"
+          />
+        </div>
+
+        <div class="form-group mb-2">
+          <label for="new-password" class="form-label">Initiales Passwort</label>
+          <InputText 
+            id="new-password" 
+            v-model="newPassword" 
+            type="password" 
+            placeholder="Passwort eingeben" 
+            class="w-full"
+            @keydown.enter="handleCreateUser"
+          />
+        </div>
+      </div>
+
+      <template #footer>
+        <Button 
+          label="Abbrechen" 
+          severity="secondary" 
+          text 
+          @click="closeCreateDialog" 
+          :disabled="createMutation.isPending.value"
+        />
+        <Button 
+          label="Benutzer anlegen" 
+          icon="pi pi-check" 
+          :loading="createMutation.isPending.value" 
+          @click="handleCreateUser" 
+        />
+      </template>
+    </Dialog>
   </div>
 </template>
 
@@ -161,5 +248,21 @@ const handleRestore = async (userId: number) => {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
+}
+
+.create-user-form {
+  padding-top: 0.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
 }
 </style>
