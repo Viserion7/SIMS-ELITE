@@ -1,5 +1,7 @@
 # Frontend Architektur & API Guide
 
+> 📖 **Detaillierter KI- & Entwickler-Leitfaden:** Siehe auch [AI_SYSTEM_GUIDE.md](./AI_SYSTEM_GUIDE.md) für eine vollständige Komponenten-, Flow- und Routing-Dokumentation.
+
 Kompakte Übersicht über Konfiguration, Backend-Kopplung, Auth/Bearer-Token und Ordnerstruktur.
 
 ---
