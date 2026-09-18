@@ -1,19 +1,21 @@
 # Handover & Bugreport für Backend / Datenbank-Zuständige
 
 > **Zusammenfassung:**  
-> Dieses Dokument richtet sich an das Team bzw. die Zuständigen für **`sims-aggregator`** und **`sims-identity`**. Es beschreibt zwei kritische Punkte im Backend, die das Speichern von Vorfällen und die Kategorie-Zuordnung betreffen.
+> Dieses Dokument richtet sich an das Team bzw. die Zuständigen für **`sims-aggregator`** . Es beschreibt einen kritischen Punkt im Backend, die das Speichern von Vorfällen betreffen.
 
 ---
 
 ## 1. Kritischer Bug in `sims-aggregator`: Incidents können nicht angelegt werden (HTTP 500)
 
 ### Fehlerbeschreibung
+
 Beim Hochladen eines STIX 2.1 Bundles über den STIX-Ingest (`sims-stix-ingest`) parst dieser die Objekte und sendet jedes Domain-Objekt per HTTP POST an den Aggregator:
 `POST http://aggregator:8080/api/v1/Incidents`
 
 Der Aggregator stürzt dabei mit einem **HTTP 500 Internal Server Error** ab.
 
 ### Genaue Ursache (aus den Container-Logs)
+
 ```text
 Npgsql.PostgresException (0x80004005): 42804: column "deleted_by" is of type uuid but expression is of type integer
 Hint: You will need to rewrite or cast the expression.
@@ -24,7 +26,7 @@ at sims_aggregator.Controllers.IncidentsController.AddIncident(CreateIncidentDto
    ```csharp
    public int? deleted_by { get; set; } = null;
    ```
-   *(Dies geschah, um zur User-ID aus `sims-identity` zu passen).*
+   _(Dies geschah, um zur User-ID aus `sims-identity` zu passen)._
 2. In der existierenden PostgreSQL-Datenbank `aggregator` (Tabelle `public.Incidents`) ist die Spalte `deleted_by` jedoch noch als **`uuid`** definiert:
    ```sql
    Column     | Type
@@ -33,22 +35,28 @@ at sims_aggregator.Controllers.IncidentsController.AddIncident(CreateIncidentDto
    ```
 3. Weil Entity Framework Core beim `AddIncident` nun versucht, einen Integer-Wert (oder einen als integer typisierten Parameter) in eine `uuid`-Spalte einzufügen, bricht PostgreSQL mit Fehler `42804` ab.
 4. **Folge:**
-   * Keines der Incidents wird in der Datenbank gespeichert.
-   * `sims-stix-ingest` meldet: `incidentsCreated: 0`.
-   * Die nachfolgenden `relationship`-Objekte scheitern mit HTTP 404, da die referenzierten Incidents nicht existieren.
+   - Keines der Incidents wird in der Datenbank gespeichert.
+   - `sims-stix-ingest` meldet: `incidentsCreated: 0`.
+   - Die nachfolgenden `relationship`-Objekte scheitern mit HTTP 404, da die referenzierten Incidents nicht existieren.
 
 ### Was muss das Aggregator-Team tun?
+
 Es gibt zwei Möglichkeiten, das zu beheben:
 
 #### Option A: Spaltentyp in PostgreSQL anpassen (Sofortlösung)
+
 In der Datenbank `aggregator` auf dem Postgres-Server ausführen:
+
 ```sql
 ALTER TABLE "Incidents" ALTER COLUMN deleted_by TYPE integer USING NULL;
 ```
-*(Hinweis: Befindet sich der Aggregator in Docker: `docker exec -it <dbAggregator-container> psql -U postgres -d aggregator -c "ALTER TABLE \"Incidents\" ALTER COLUMN deleted_by TYPE integer USING NULL;"`)*
+
+_(Hinweis: Befindet sich der Aggregator in Docker: `docker exec -it <dbAggregator-container> psql -U postgres -d aggregator -c "ALTER TABLE \"Incidents\" ALTER COLUMN deleted_by TYPE integer USING NULL;"`)_
 
 #### Option B: Saubere EF Core Migration erstellen
+
 Im Projekt `sims-aggregator`:
+
 1. Neue Migration anlegen:
    ```bash
    dotnet ef migrations add ChangeDeletedByToInteger
@@ -58,30 +66,3 @@ Im Projekt `sims-aggregator`:
    // Statt EnsureCreated() (das bestehende Tabellen nicht aktualisiert):
    db.Database.Migrate();
    ```
-
----
-
-## 2. Hinweis zu `sims-identity`: Kategorie-Seeding für Level 2 (Medium)
-
-### Beobachtung
-In `sims-identity/Data/Seeding.cs`:
-* 40 von 41 STIX-Kategorien sind fest `LevelId = 1` („Low“) zugewiesen.
-* 1 Kategorie (`artifact`) ist `LevelId = 3` („High“) zugewiesen.
-* **Level 2 („Medium“) hat 0 zugewiesene Kategorien!**
-
-### Auswirkung
-Wenn ein Benutzer (wie z. B. der initial angelegte `admin@local`) nur dem Level „Medium“ (Level 2) zugeordnet ist, liefert `GET /api/v1/User/{id}/details` für ihn ein leeres Array bei `categorys: []`.
-
-### Empfehlung für das Identity-Team
-Im Seeder `sims-identity/Data/Seeding.cs` sollten die Kategorien fachlich sinnvoll auf Low, Medium und High verteilt werden (z. B. Indicators/Observables auf Low, Malware/Intrusions auf Medium, Vulnerabilities/Exploits auf High).
-
----
-
-## 3. Bereits erledigte Arbeiten im Frontend & Identity-Controller
-
-1. **Bugfix `sims-identity/Controllers/Assignments.cs`:**
-   * Beim Entfernen und Zuweisen von Levels wurde `.Include(u => u.Levels)` ergänzt, sodass Änderungen nun persistent in PostgreSQL gespeichert werden.
-2. **Frontend STIX-Statistiken:**
-   * `StixUploadView.vue` und `stixResponse.ts` unterstützen nun sowohl camelCase als auch PascalCase (`incidentsCreated ?? IncidentsCreated`).
-3. **Frontend Incident-Filterung:**
-   * In `MyIncidentsView.vue` werden für Administratoren oder Benutzer ohne spezifische Kategorie-Einschränkungen alle Vorfälle angezeigt, statt den Bildschirm leer zu lassen.
