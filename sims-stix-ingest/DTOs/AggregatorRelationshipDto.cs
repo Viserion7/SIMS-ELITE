@@ -6,8 +6,8 @@ public class AggregatorRelationshipDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
-    [JsonPropertyName("from")]
+    [JsonPropertyName("idFrom")]
     public Guid From { get; set; }
-    [JsonPropertyName("to")]
+    [JsonPropertyName("idTo")]
     public Guid To { get; set; }
 }
