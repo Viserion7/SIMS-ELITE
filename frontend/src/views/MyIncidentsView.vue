@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useIncidentsQuery } from '@/composables/queries/useIncidentQueries'
 import { useCurrentUserQuery } from '@/composables/queries/useAuthQueries'
 import { useMyCategories } from '@/composables/useMyCategories'
+import { useAuthStore } from '@/stores/auth'
 import type { Incident } from '@/types'
 import PageHeader from '@/components/PageHeader.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -12,6 +13,7 @@ import Button from 'primevue/button'
 import Skeleton from 'primevue/skeleton'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const { data: userDetails } = useCurrentUserQuery()
 const allowedTypes = useMyCategories()
 
@@ -40,7 +42,10 @@ watch(rawIncidents, (newIncidents) => {
 }, { immediate: true })
 
 const filteredIncidents = computed(() => {
-  if (!allowedTypes.value.size) return []
+  // Wenn der Benutzer Admin ist ODER (noch) keine spezifischen Kategorien zugewiesen sind: Alle Vorfälle anzeigen
+  if (authStore.isAdmin || !allowedTypes.value.size) {
+    return allLoadedIncidents.value
+  }
   return allLoadedIncidents.value.filter(incident => allowedTypes.value.has(incident.type))
 })
 

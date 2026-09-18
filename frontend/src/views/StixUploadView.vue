@@ -104,15 +104,15 @@ const resetUpload = () => {
         
         <div class="stats-grid">
           <div class="stat-box">
-            <span class="stat-val">{{ successResult.IncidentsCreated }}</span>
+            <span class="stat-val">{{ successResult.incidentsCreated ?? successResult.IncidentsCreated ?? 0 }}</span>
             <span class="stat-label">Incidents (Neu)</span>
           </div>
           <div class="stat-box">
-            <span class="stat-val">{{ successResult.RelationshipsCreated }}</span>
+            <span class="stat-val">{{ successResult.relationshipsCreated ?? successResult.RelationshipsCreated ?? 0 }}</span>
             <span class="stat-label">Relationen (Neu)</span>
           </div>
           <div class="stat-box">
-            <span class="stat-val">{{ successResult.IncidentsDuplicate + successResult.RelationshipsDuplicate }}</span>
+            <span class="stat-val">{{ (successResult.incidentsDuplicate ?? successResult.IncidentsDuplicate ?? 0) + (successResult.relationshipsDuplicate ?? successResult.RelationshipsDuplicate ?? 0) }}</span>
             <span class="stat-label">Duplikate (Ignoriert)</span>
           </div>
         </div>
