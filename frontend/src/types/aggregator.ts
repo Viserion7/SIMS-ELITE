@@ -23,6 +23,8 @@ export interface Relationship {
   id: string
   idFrom: string
   idTo: string
+  from?: string
+  to?: string
 }
 
 export interface PaginationParams {

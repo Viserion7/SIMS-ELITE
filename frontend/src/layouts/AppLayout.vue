@@ -22,6 +22,7 @@ const menuItems = computed(() => {
       items: [
         { label: 'Meine Incidents', icon: 'pi pi-ticket', command: () => router.push('/incidents') },
         { label: 'Alle Incidents', icon: 'pi pi-list', command: () => router.push('/incidents/all') },
+        { label: 'Suche', icon: 'pi pi-search', command: () => router.push('/search') },
         { label: 'STIX Upload', icon: 'pi pi-upload', command: () => router.push('/upload') },
       ],
     },

@@ -9,6 +9,7 @@ import {
 import { useEscalateMutation } from '@/composables/queries/useEscalationQueries'
 import { useMyCategories } from '@/composables/useMyCategories'
 import PageHeader from '@/components/PageHeader.vue'
+import RelatedIncidentCard from '@/components/RelatedIncidentCard.vue'
 import Button from 'primevue/button'
 import Badge from 'primevue/badge'
 import DataTable from 'primevue/datatable'
@@ -24,7 +25,7 @@ const router = useRouter()
 const toast = useToast()
 const confirm = useConfirm()
 
-const incidentId = route.params.id as string
+const incidentId = computed(() => route.params.id as string)
 
 const { data: incident, isPending: loadingIncident, isError: errorIncident } = useIncidentDetailQuery(incidentId)
 const { data: relationships, isPending: loadingRels } = useIncidentRelationshipsQuery(incidentId)
@@ -62,7 +63,7 @@ const confirmMarkAsSeen = () => {
     acceptClass: 'p-button-success',
     accept: async () => {
       try {
-        await deleteMutation.mutateAsync(incidentId)
+        await deleteMutation.mutateAsync(incidentId.value)
         toast.add({
           severity: 'success',
           summary: 'Als gesehen markiert',
@@ -90,13 +91,13 @@ const handleEscalate = async () => {
 
   try {
     await escalateMutation.mutateAsync({
-      incidentId: incidentId,
+      incidentId: incidentId.value,
       message: escalateMessage.value.trim(),
     })
     toast.add({ 
       severity: 'success', 
       summary: 'Erfolg', 
-      detail: `Eskalation für Vorfall ${incident.value?.name || incidentId} wurde erfolgreich versendet.`, 
+      detail: `Eskalation für Vorfall ${incident.value?.name || incidentId.value} wurde erfolgreich versendet.`, 
       life: 3500 
     })
     showEscalateModal.value = false
@@ -302,40 +303,20 @@ const shortId = (id?: string) => {
             </div>
           </div>
           
-          <div class="table-container">
-            <DataTable :value="relationships" :loading="loadingRels" stripedRows responsiveLayout="scroll">
-              <Column header="Von (Incident / STIX ID)">
-                <template #body="slotProps">
-                  <span 
-                    :title="slotProps.data.idFrom || slotProps.data.from" 
-                    class="mono-chip" 
-                    @click="copyToClipboard(slotProps.data.idFrom || slotProps.data.from)"
-                  >
-                    {{ shortId(slotProps.data.idFrom || slotProps.data.from) }}
-                    <i class="pi pi-copy chip-copy-icon"></i>
-                  </span>
-                </template>
-              </Column>
-              <Column header="Beziehung" style="width: 100px; text-align: center;">
-                <template #body>
-                  <span class="relation-arrow">
-                    <i class="pi pi-arrow-right"></i>
-                  </span>
-                </template>
-              </Column>
-              <Column header="Nach (Incident / STIX ID)">
-                <template #body="slotProps">
-                  <span 
-                    :title="slotProps.data.idTo || slotProps.data.to" 
-                    class="mono-chip" 
-                    @click="copyToClipboard(slotProps.data.idTo || slotProps.data.to)"
-                  >
-                    {{ shortId(slotProps.data.idTo || slotProps.data.to) }}
-                    <i class="pi pi-copy chip-copy-icon"></i>
-                  </span>
-                </template>
-              </Column>
-            </DataTable>
+          <div v-if="relationships.length > 0" class="relations-grid">
+            <div v-for="rel in relationships" :key="rel.id" class="relation-item">
+              <!-- Da wir den STIX-Bug noch haben, kann ID leer sein oder es steht was in from/to.
+                   Wir versuchen die ID zu erraten, je nach dem was gefüllt ist. -->
+              <div class="relation-badge">
+                <Badge value="Verknüpft" severity="info" class="mb-2" />
+              </div>
+              <RelatedIncidentCard 
+                :incidentId="(rel.idTo === incident.id ? (rel.idFrom || rel.from) : (rel.idTo || rel.to)) as string" 
+              />
+            </div>
+          </div>
+          <div v-else class="text-500 font-italic py-4 text-center surface-100 border-round">
+            Keine Verknüpfungen zu anderen Vorfällen vorhanden.
           </div>
         </div>
       </div>
