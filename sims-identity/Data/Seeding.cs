@@ -79,13 +79,13 @@ public class Seeder
                     {
                         name = "attack-pattern",
                         description = "STIX beschreibt, wie ein Angriff ausgeführt wird.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "campaign",
                         description = "STIX beschreibt eine zusammengehörige Angriffskampagne.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
@@ -109,25 +109,25 @@ public class Seeder
                     {
                         name = "incident",
                         description = "STIX beschreibt einen Sicherheitsvorfall.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
                         name = "indicator",
                         description = "STIX beschreibt ein Muster zur Erkennung möglicher Bedrohungen.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
                         name = "infrastructure",
                         description = "STIX beschreibt technische Infrastruktur einer Bedrohung.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "intrusion-set",
                         description = "STIX beschreibt eine Gruppe oder Sammlung von Angriffen.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
@@ -139,13 +139,13 @@ public class Seeder
                     {
                         name = "malware",
                         description = "STIX beschreibt Schadsoftware.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
                         name = "malware-analysis",
                         description = "STIX beschreibt die Analyse von Schadsoftware.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
@@ -157,7 +157,7 @@ public class Seeder
                     {
                         name = "observed-data",
                         description = "STIX beschreibt beobachtete Daten aus einem Netzwerk oder System.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
@@ -169,25 +169,25 @@ public class Seeder
                     {
                         name = "report",
                         description = "STIX fasst Informationen zu einer Bedrohung zusammen.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "threat-actor",
                         description = "STIX beschreibt einen Angreifer oder eine Angreifergruppe.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
                         name = "tool",
                         description = "STIX beschreibt ein Werkzeug, das bei Angriffen verwendet wird.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "vulnerability",
                         description = "STIX beschreibt eine Schwachstelle in einem System.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
 
                     // STIX Cyber-observable Objects
@@ -195,7 +195,7 @@ public class Seeder
                     {
                         name = "artifact",
                         description = "STIX beschreibt beliebige Binärdaten oder Dateien.",
-                        LevelId = highLevel
+                        LevelId = lowLevel
                     },
                     new Category
                     {
@@ -213,37 +213,37 @@ public class Seeder
                     {
                         name = "domain-name",
                         description = "STIX beschreibt einen Domainnamen.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "email-addr",
                         description = "STIX beschreibt eine E-Mail-Adresse.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "email-message",
                         description = "STIX beschreibt eine E-Mail-Nachricht.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "file",
                         description = "STIX beschreibt eine Datei.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "ipv4-addr",
                         description = "STIX beschreibt eine IPv4-Adresse.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "ipv6-addr",
                         description = "STIX beschreibt eine IPv6-Adresse.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
@@ -261,43 +261,43 @@ public class Seeder
                     {
                         name = "network-traffic",
                         description = "STIX beschreibt Netzwerkverkehr.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "process",
                         description = "STIX beschreibt einen laufenden Prozess.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "software",
                         description = "STIX beschreibt Software oder ein Betriebssystem.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "url",
                         description = "STIX beschreibt eine URL.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "user-account",
                         description = "STIX beschreibt ein Benutzerkonto.",
-                        LevelId = lowLevel
+                        LevelId = highLevel
                     },
                     new Category
                     {
                         name = "windows-registry-key",
                         description = "STIX beschreibt einen Windows-Registrierungsschlüssel.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
                     new Category
                     {
                         name = "x509-certificate",
                         description = "STIX beschreibt ein X.509-Zertifikat.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
 
                     // STIX Relationship Objects
@@ -311,7 +311,7 @@ public class Seeder
                     {
                         name = "sighting",
                         description = "STIX beschreibt das Beobachten eines Objekts.",
-                        LevelId = lowLevel
+                        LevelId = mediumLevel
                     },
 
                     // STIX Meta Objects
