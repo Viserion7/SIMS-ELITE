@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useIncidentsQuery, useDeleteIncidentMutation } from '@/composables/queries/useIncidentQueries'
 import { useCurrentUserQuery } from '@/composables/queries/useAuthQueries'
 import { useMyCategories } from '@/composables/useMyCategories'
-import { useAuthStore } from '@/stores/auth'
 import type { Incident } from '@/types'
 import PageHeader from '@/components/PageHeader.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -15,7 +14,6 @@ import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
-const authStore = useAuthStore()
 const confirm = useConfirm()
 const toast = useToast()
 const deleteMutation = useDeleteIncidentMutation()
@@ -47,7 +45,7 @@ watch(rawIncidents, (newIncidents) => {
 }, { immediate: true })
 
 const filteredIncidents = computed(() => {
-  if (authStore.isAdmin || !allowedTypes.value.size) {
+  if (!allowedTypes.value.size) {
     return allLoadedIncidents.value
   }
   return allLoadedIncidents.value.filter(incident => allowedTypes.value.has(incident.type))
