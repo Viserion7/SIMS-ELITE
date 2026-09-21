@@ -89,6 +89,7 @@ services:
       - MongoDbSettings__CollectionName=stix_bundles
       - AggregatorSettings__BaseUrl=http://aggregator:8080
       - OTEL_EXPORTER_OTLP_ENDPOINT__url=${OTEL_EXPORTER_OTLP_ENDPOINT__URL:-}
+      - OTEL_EXPORTER_OTLP_ENDPOINT__key=${OTEL_EXPORTER_OTLP_ENDPOINT__KEY:-}
     depends_on:
       dbstix:
         condition: service_healthy
