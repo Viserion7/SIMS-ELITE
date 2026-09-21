@@ -1,94 +1,65 @@
-# Usefull things
+# SIMS-ELITE
 
-http://localhost:5066/scalar/
+## 📖 Overview
 
-# Für Uns Docs (Kann man später weglöschen!)
+kurz erklörung wichtig auf usp achten
 
-dotnet new webapi -n sims -f net10.0 --use-program-main -controllers
-dotnet sln sims.slnx add sims/sims.csproj
+### Key Features
 
-## Logger Usage daweil nur für mich Recherche LG Yannick
+## 🛠️ Tech Stack
 
-einbinden der libraries in datei wo man es braucht (z.B. Controller)
+## 🏗️ Architecture
 
-```csharp
-using Microsoft.Extensions.Logging;
+### System Overview & Components
 
-// 1. Variable für den Logger anlegen
-    private readonly ILogger<SimsController> _logger;
+uml für serivces sturktur,
 
-// 2. Logger per Constructor Injection laden
-    public SimsController(ILogger<SimsController> logger)
-    {
-        _logger = logger;
-    }
-```
+- etvl klassen digram einzlen aber das wäre wk zu viel...
 
-beispiel nutzung:
+### Data Model
 
-```csharp
-var userId = 42;
-var action = "Login";
+dbml yml reingeben
 
-// FALSCH (SigNoz sieht nur einen langen Text, du kannst nicht nach UserId filtern):
-_logger.LogInformation($"User {userId} hat {action} ausgeführt.");
+### Security Architecture & Auth Flow
 
-// RICHTIG (SigNoz speichert "UserId" und "Action" als extra Felder in z.B. Signoz filter):
-_logger.LogInformation("User {UserId} hat {Action} ausgeführt.", userId, action);
+## 🚀 Getting Started
 
+local run
 
+local build
 
+und mit images von github
 
-////---------------- bei Try Catch kann man auch noch die Exception mitgeben
- try
-{
-    throw new Exception("Datenbank nicht erreichbar");
-}
-catch (Exception ex)
-{
-    var orderId = 99;
-    _logger.LogError(ex, "Fehler beim Verarbeiten von Bestellung {OrderId}", orderId);
-}
-```
+### Prerequisites
 
-alle möglichen methoden für logger von .net
+ef zuegs für global evtl beschierben
 
-| Methode            | Wann verwenden?                                | Beispiel-Szenario                           |
-| ------------------ | ---------------------------------------------- | ------------------------------------------- |
-| `LogTrace()`       | Feinste Details, oft nur temporär aktiviert    | "Starte For-Schleife für Item 4 von 1000."  |
-| `LogDebug()`       | Wertvolle Daten für Entwickler zur Fehlersuche | "Lade User-Profil aus Cache. Cache-Key: X." |
-| `LogInformation()` | Wichtige Meilensteine im Geschäftsablauf       | "Bestellung 1234 erfolgreich angelegt."     |
-| `LogWarning()`     | Unerwartetes, aber das System läuft weiter     | "API liefert Timeout, starte Retry 1/3."    |
-| `LogError()`       | Der aktuelle Request ist fehlgeschlagen        | "Datenbankabfrage für User 42 abgebrochen." |
-| `LogCritical()`    | Systemweiter Absturz oder Notfall              | "Haupt-Datenbank nicht erreichbar!"         |
+### Environment Variables (.env)
 
-### Setup OpenTelemetry in .NET 10
+## 💻 Usage & Running
 
-1. In Program dependencies hinzufügen:
+bei docker läfzt forntend mit proxy und compose netwzerk für verbindung zu sevrices ....
 
-```bash
-dotnet add package OpenTelemetry.Extensions.Hosting
-dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
-dotnet add package OpenTelemetry.Instrumentation.AspNetCore
-dotnet add package OpenTelemetry.Instrumentation.Http
-```
+### Development
 
-2. In Projekt die OpenTelemetry Konfiguration hinzufügen, siehe https://signoz.io/blog/opentelemetry-dotnet-logs/
-3. die appSettings json anpassen, siehe https://signoz.io/blog/opentelemetry-dotnet-logs/
+hier funktiuniert scala ....
 
-# Start
+## 📊 Logging & Monitoring
 
-Siehe ./depl-kram ordner, hier befinden sich unterschieldiche docker compose datein welche für unterschiedliche zwekce vorhanden sind.
-nach cd zum ordner, kann man mittel compose den contaienr stack starten.
+wie nutzen open teemetry mit signoz und tracing bitte env füllen ....
 
-1. ein compose für die lokale run entwicklung, wo nur die dbs angelegt werden und ports gemapped werden.
-2. ein compose wo die images direkt on up gebaut werden für ein locales testen builden
-3. ein compose für die produktivumgebung, wo die images direkt vom Github reg. gezogen werden
+## 🔒 Security
 
-## Frontend per CLI für dev Starten
+jwt wird benutzt es gibt extra endpioint um jwt zu rpüfen
 
-```bash
-cd ./frontend
-npm install
-npm run dev
-```
+## 📚 Documentation & Useful Links
+
+siehe docs folder
+
+## 👥 Contributing
+
+platzhalter für drei elite angestellte
+
+## 📄 License
+
+gehört nur uns nicht open soruce
