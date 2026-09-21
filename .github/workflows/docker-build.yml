@@ -139,7 +139,7 @@ jobs:
 
           for SERVICE in "${SERVICES[@]}"; do
             # 1. Generate SBOM
-            dotnet-cyclonedx "$SERVICE/$SERVICE.csproj" \
+            dotnet-CycloneDX "$SERVICE/$SERVICE.csproj" \
               -o ./sbom-output \
               -f "bom-$SERVICE.json" \
               --json
