@@ -299,6 +299,7 @@ Kopiere `.env.example` bzw. lege die Variablen vor dem Start an:
 - 📋 **[Setup & CLI Befehle](docs/setup-and-commands.md)**
 - 🏃 **[Projekt starten (Guide)](docs/running-the-project.md)**
 - 📝 **[Logging Guidelines (SigNoz)](docs/logger-usage.md)**
+- 🔐 **[Semgrep Security Report](docs/semgrep-security-report.md)**
 - 🔗 **[Nützliche Links & Ports](docs/useful-links.md)**
 
 ---
