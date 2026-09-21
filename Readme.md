@@ -230,10 +230,10 @@ npm run dev
 
 Im Development-Modus besitzt jeder Service eine interaktive Scalar-Dokumentation:
 
-- **Identity API**: `http://localhost:67/scalar/v1`
-- **Aggregator API**: `http://localhost:88/scalar/v1`
-- **Incident Manager API**: `http://localhost:420/scalar/v1`
-- **STIX Ingest API**: `http://localhost:8080/scalar/v1`
+- **Identity API**: `http://localhost:67/scalar/`
+- **Aggregator API**: `http://localhost:88/scalar/`
+- **Incident Manager API**: `http://localhost:420/scalar/`
+- **STIX Ingest API**: `http://localhost:8080/scalar/`
 
 ---
 
