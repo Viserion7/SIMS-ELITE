@@ -1,9 +1,9 @@
-name: Build and Publish Docker Images and SBOMs
+name: Build and Publish Docker Images
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  #release:
+    #types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -17,8 +17,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to attach SBOMs to the release
-      packages: write # Needed to push Docker images to GHCR
+      contents: write 
+      packages: write 
 
     steps:
       - name: Checkout repository
