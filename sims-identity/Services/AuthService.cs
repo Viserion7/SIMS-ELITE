@@ -33,6 +33,11 @@ public class AuthService
             return null; // Invalid credentials
         }
 
+        if (user.is_deleted == true)
+        {
+            return null; 
+        }
+
         var accessToken = GenerateAccessToken(user);
         var refreshToken = await GenerateRefreshTokenAsync(user);
 
