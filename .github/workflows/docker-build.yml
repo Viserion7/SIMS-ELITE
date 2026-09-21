@@ -76,6 +76,26 @@ jobs:
           labels: ${{ steps.meta-aggregator.outputs.labels }}
 
       # ==========================================
+      # INCIDENT MANAGER
+      # ==========================================
+      - name: Extract metadata for incidentmanager
+        id: meta-incidentmanager
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-incidentmanager
+          tags: |
+            type=semver,pattern={{raw}}
+
+      - name: Build and push incidentmanager Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./sims-incidentManager
+          file: ./sims-incidentManager/Dockerfile
+          push: true
+          tags: ${{ steps.meta-incidentmanager.outputs.tags }}
+          labels: ${{ steps.meta-incidentmanager.outputs.labels }}
+
+      # ==========================================
       # IDENTITY
       # ==========================================
       - name: Extract metadata for identity
@@ -135,7 +155,7 @@ jobs:
         run: |
           mkdir -p ./sbom-output
 
-          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest")
+          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest" "sims-incidentManager")
 
           for SERVICE in "${SERVICES[@]}"; do
             # 1. Generate SBOM
