@@ -135,7 +135,7 @@ jobs:
         run: |
           mkdir -p ./sbom-output
 
-          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest" "frontend")
+          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest")
 
           for SERVICE in "${SERVICES[@]}"; do
             # 1. Generate SBOM
@@ -168,6 +168,38 @@ jobs:
               exit 1
             fi
           done
+
+      # ==========================================
+      # 2. GENERATE & UPLOAD FRONTEND (NPM) SBOM
+      # ==========================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate and Upload Frontend SBOM
+        env:
+          DEPTRACK_URL: ${{ secrets.DEPENDENCY_TRACK_URL }}
+          DEPTRACK_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+        run: |
+          cd frontend
+          npm ci
+          # Generates CycloneDX JSON for Vue / npm packages
+          npx @cyclonedx/cyclonedx-npm --output-file ../sbom-output/bom-frontend.json --output-format JSON
+          cd ..
+
+          BOM_BASE64=$(base64 -w 0 "./sbom-output/bom-frontend.json")
+
+          curl -s -X PUT "$DEPTRACK_URL/api/v1/bom" \
+            -H "Content-Type: application/json" \
+            -H "X-Api-Key: $DEPTRACK_KEY" \
+            -d "{
+              \"projectName\": \"frontend\",
+              \"projectVersion\": \"${{ github.ref_name }}\",
+              \"autoCreate\": true,
+              \"bom\": \"$BOM_BASE64\"
+            }"
+          echo "Uploaded frontend to Dependency-Track"
 
       # ==========================================
       # ATTACH TO GITHUB RELEASE
