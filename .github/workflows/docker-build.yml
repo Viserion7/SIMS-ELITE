@@ -130,8 +130,8 @@ jobs:
 
       - name: Generate and Upload SBOMs to Dependency-Track
         env:
-          DEPTRACK_URL: ${{ secrets.DEPTRACK_URL }}
-          DEPTRACK_KEY: ${{ secrets.DEPTRACK_KEY }}
+          DEPTRACK_URL: ${{ secrets.DEPENDENCY_TRACK_URL }}
+          DEPTRACK_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
         run: |
           mkdir -p ./sbom-output
 
@@ -144,7 +144,7 @@ jobs:
               --filename "bom-$SERVICE.json" \
               --json
 
-            # 2. Base64 encode the file (THIS WAS MISSING)
+            # 2. Base64 encode the file
             BOM_BASE64=$(base64 -w 0 "./sbom-output/bom-$SERVICE.json")
 
             # 3. Upload to Dependency-Track Server
