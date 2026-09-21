@@ -1,18 +1,25 @@
 // ==========================================
-// MICROSERVICE 2: DATA RECORD
+// SIMS AGGREGATOR SERVICE (PostgreSQL)
 // ==========================================
 
-Table data_record {
-  id uuid [pk] // Wird durch das externe System befüllt
-  eid varchar // Extra Entity-ID des Eintrags selbst (für spätere Relationen)
-  
-  created_at timestamp // Wird aktiv von euch übergeben, kein automatischer DB-Default mehr
-  db_created_at timestamp [default: `now()`] // Neuer automatischer Zeitstempel für den DB-Eintrag
-  
-  source_format varchar [not null]
-  type varchar [not null]
-  name varchar [not null]
-  desc text  
-  is_deleted boolean [default: false] // Für Soft-Deletes
-  deleted_by uuid // Nullable. Speichert, wer den Eintrag gelöscht hat.
+Table incident {
+  id uuid [pk]                                // GUID Primary Key
+  created_at timestamp                       // Externer Zeitstempel (z.B. von TAXII / STIX)
+  db_created_at timestamp [default: `now()`] // DB-Insert-Zeitstempel
+  is_deleted boolean [default: false]         // Soft Delete Flag
+  deleted_by int [null]                       // User-ID der löschenden Person (nullable)
+  source_format varchar [not null]            // Formatquelle (z.B. "taxii", "raw json")
+  type varchar [not null]                     // Incident / Object Type
+  name varchar [not null]                     // Name / Titel des Incidents
+  desc text                                   // Beschreibung / Details
 }
+
+Table relationship {
+  id uuid [pk]                                // GUID Primary Key
+  idFrom uuid [not null]                      // Ursprungs-Incident ID
+  idTo uuid [not null]                        // Ziel-Incident ID
+}
+
+// Logische Verknüpfungen der Incidents
+Ref: relationship.idFrom > incident.id
+Ref: relationship.idTo > incident.id

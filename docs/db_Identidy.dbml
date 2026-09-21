@@ -6,19 +6,28 @@ Table user {
   email varchar [unique, not null]
   password_hash varchar [not null]
   is_deleted boolean [default: false]
+  is_Admin boolean [default: false]
+  is_ToNotify boolean [default: false]
+}
+
+Table refresh_token {
+  id int [pk, increment]
+  token varchar [not null]
+  user_id int [not null]
+  expires timestamp [not null]
+  is_revoked boolean [default: false]
 }
 
 Table level {
   id int [pk, increment]
   name varchar [unique, not null] // z.B. "low", "medium", "high" oder "beta-tester"
-  // description wurde hier entfernt
 }
 
 Table category {
   id int [pk, increment]
   name varchar [not null]
-  description text                // <-- Hier ist die Beschreibung (neu hinzugefügt)
-  level_id int [not null]         // Jede Kategorie gehört zu genau einem Level/Paket
+  description text
+  level_id int [not null]         // Jede Kategorie gehört zu genau einem Level
 }
 
 // ==========================================
@@ -39,3 +48,4 @@ Table user_level {
 Ref: user_level.user_id > user.id
 Ref: user_level.level_id > level.id
 Ref: category.level_id > level.id
+Ref: refresh_token.user_id > user.id
