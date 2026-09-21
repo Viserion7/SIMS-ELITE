@@ -1,9 +1,9 @@
-name: Build and Publish Docker Images
+name: Build and Publish Docker Images and SBOMs
 
 on:
   workflow_dispatch:
-  #release: # auskommentiert, weil dockerfiles daweil noch leer
-  #  types: [published] # On Realise ausgelöst dann
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -17,8 +17,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      packages: write
+      contents: write # Needed to attach SBOMs to the release
+      packages: write # Needed to push Docker images to GHCR
 
     steps:
       - name: Checkout repository
@@ -33,7 +33,8 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} # Token Auto von Repo
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       # ==========================================
       # FRONTEND
       # ==========================================
@@ -43,8 +44,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-frontend
           tags: |
-            # immer vers nummer dazu
             type=semver,pattern={{raw}}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+
       - name: Build and push Frontend Image
         uses: docker/build-push-action@v5
         with:
@@ -55,7 +57,7 @@ jobs:
           labels: ${{ steps.meta-frontend.outputs.labels }}
       
       # ==========================================
-      # Aggregator
+      # AGGREGATOR
       # ==========================================
       - name: Extract metadata for aggregator
         id: meta-aggregator
@@ -63,8 +65,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-aggregator
           tags: |
-            # immer vers nummer dazu
             type=semver,pattern={{raw}}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+
       - name: Build and push aggregator Image
         uses: docker/build-push-action@v5
         with:
@@ -74,10 +77,47 @@ jobs:
           tags: ${{ steps.meta-aggregator.outputs.tags }}
           labels: ${{ steps.meta-aggregator.outputs.labels }}
 
-      
       # ==========================================
-      # To Do Weitere
+      # IDENTITY
       # ==========================================
+      - name: Extract metadata for identity
+        id: meta-identity
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-identity
+          tags: |
+            type=semver,pattern={{raw}}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+
+      - name: Build and push identity Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./sims-identity
+          file: ./sims-identity/Dockerfile
+          push: true
+          tags: ${{ steps.meta-identity.outputs.tags }}
+          labels: ${{ steps.meta-identity.outputs.labels }}
+
+      # ==========================================
+      # STIX INGEST
+      # ==========================================
+      - name: Extract metadata for stix-ingest
+        id: meta-stix-ingest
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.repo_name.outputs.lowercase_repo }}-stix-ingest
+          tags: |
+            type=semver,pattern={{raw}}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+
+      - name: Build and push stix-ingest Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./sims-stix-ingest
+          file: ./sims-stix-ingest/Dockerfile
+          push: true
+          tags: ${{ steps.meta-stix-ingest.outputs.tags }}
+          labels: ${{ steps.meta-stix-ingest.outputs.labels }}
 
       # ==========================================
       # SBOM GENERATION & DEPENDENCY-TRACK
@@ -100,11 +140,13 @@ jobs:
           SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest")
 
           for SERVICE in "${SERVICES[@]}"; do
+            # 1. Generate SBOM
             dotnet-cyclonedx "$SERVICE/$SERVICE.csproj" \
               -o ./sbom-output \
               -f "bom-$SERVICE.json" \
               --json
 
+            # 2. Upload to Dependency-Track Server
             RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$DEPTRACK_URL/api/v1/bom" \
               -H "X-Api-Key: $DEPTRACK_KEY" \
               -F "projectName=$SERVICE" \
@@ -132,4 +174,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ github.ref_name }} ./sbom-output/bom-*.json --clobber
-     
