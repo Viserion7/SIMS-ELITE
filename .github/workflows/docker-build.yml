@@ -145,12 +145,15 @@ jobs:
               --json
 
             # 2. Upload to Dependency-Track Server
-            RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "$DEPTRACK_URL/api/v1/bom" \
+            RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X PUT "$DEPTRACK_URL/api/v1/bom" \
+              -H "Content-Type: application/json" \
               -H "X-Api-Key: $DEPTRACK_KEY" \
-              -F "projectName=$SERVICE" \
-              -F "projectVersion=${{ github.ref_name }}" \
-              -F "autoCreate=true" \
-              -F "bom=@./sbom-output/bom-$SERVICE.json")
+              -d "{
+                \"projectName\": \"$SERVICE\",
+                \"projectVersion\": \"${{ github.ref_name }}\",
+                \"autoCreate\": true,
+                \"bom\": \"$BOM_BASE64\"
+              }")
 
             HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
 
