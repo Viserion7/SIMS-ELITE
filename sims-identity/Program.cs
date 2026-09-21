@@ -28,6 +28,7 @@ public class Program
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         });
 
+        //to do es als addserivces!
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<UserService>();
         builder.Logging.AddConsole();
