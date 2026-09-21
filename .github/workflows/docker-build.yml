@@ -224,9 +224,9 @@ jobs:
           '
 
           # 3. Stream the payload file directly to Dependency-Track
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X PUT "$DEPTRACK_URL/api/v1/bom" \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X PUT "$DEPENDENCY_TRACK_URL/api/v1/bom" \
             -H "Content-Type: application/json" \
-            -H "X-Api-Key: $DEPTRACK_KEY" \
+            -H "X-Api-Key: $DEPENDENCY_TRACK_API_KEY" \
             --data-binary @./sbom-output/payload-frontend.json)
 
           HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
