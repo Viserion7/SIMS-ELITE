@@ -135,7 +135,7 @@ jobs:
         run: |
           mkdir -p ./sbom-output
 
-          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest")
+          SERVICES=("sims-identity" "sims-aggregator" "sims-stix-ingest" "frontend")
 
           for SERVICE in "${SERVICES[@]}"; do
             # 1. Generate SBOM
