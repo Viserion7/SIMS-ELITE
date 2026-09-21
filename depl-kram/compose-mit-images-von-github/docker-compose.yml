@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
 
   incident-manager:
-    image: ghcr.io/viserion7/sims-elite-incident-manager:latest
+    image: ghcr.io/viserion7/sims-elite-incidentmanager:latest
     expose:
       - "8080"
     environment:
