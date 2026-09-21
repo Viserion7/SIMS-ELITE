@@ -175,31 +175,49 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22' # Upgraded to 22 to fix the EBADENGINE warnings
 
       - name: Generate and Upload Frontend SBOM
         env:
-          DEPTRACK_URL: ${{ secrets.DEPENDENCY_TRACK_URL }}
-          DEPTRACK_KEY: ${{ secrets.DEPENDENCY_TRACK_API_KEY }}
+          DEPTRACK_URL: ${{ secrets.DEPTRACK_URL }}
+          DEPTRACK_KEY: ${{ secrets.DEPTRACK_KEY }}
+          PROJECT_VERSION: ${{ github.ref_name }}
         run: |
           cd frontend
           npm ci
-          # Generates CycloneDX JSON for Vue / npm packages
+          
+          # 1. Generate the Frontend CycloneDX SBOM
           npx @cyclonedx/cyclonedx-npm --output-file ../sbom-output/bom-frontend.json --output-format JSON
           cd ..
 
-          BOM_BASE64=$(base64 -w 0 "./sbom-output/bom-frontend.json")
+          # 2. Build the JSON payload on disk using Node (avoids Linux 'Argument list too long' error)
+          node -e '
+            const fs = require("fs");
+            const bom = fs.readFileSync("./sbom-output/bom-frontend.json").toString("base64");
+            const payload = {
+              projectName: "frontend",
+              projectVersion: process.env.PROJECT_VERSION,
+              autoCreate: true,
+              bom: bom
+            };
+            fs.writeFileSync("./sbom-output/payload-frontend.json", JSON.stringify(payload));
+          '
 
-          curl -s -X PUT "$DEPTRACK_URL/api/v1/bom" \
+          # 3. Stream the payload file directly to Dependency-Track
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X PUT "$DEPTRACK_URL/api/v1/bom" \
             -H "Content-Type: application/json" \
             -H "X-Api-Key: $DEPTRACK_KEY" \
-            -d "{
-              \"projectName\": \"frontend\",
-              \"projectVersion\": \"${{ github.ref_name }}\",
-              \"autoCreate\": true,
-              \"bom\": \"$BOM_BASE64\"
-            }"
-          echo "Uploaded frontend to Dependency-Track"
+            --data-binary @./sbom-output/payload-frontend.json)
+
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d':' -f2)
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "SUCCESS: frontend successfully ingested by Dependency-Track!"
+          else
+            echo "ERROR: Dependency-Track rejected frontend (HTTP $HTTP_STATUS)"
+            echo "$RESPONSE"
+            exit 1
+          fi
 
       # ==========================================
       # ATTACH TO GITHUB RELEASE
