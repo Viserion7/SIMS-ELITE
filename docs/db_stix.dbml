@@ -1,0 +1,28 @@
+// ==========================================
+// SIMS STIX INGEST SERVICE (MongoDB - stix_db)
+// ==========================================
+// Hinweis: MongoDB ist schemalos (NoSQL / BSON).
+// Dieses DBML bildet die Dokumentenstruktur der Collection "stix_bundles" ab.
+
+Table stix_bundles {
+  _id objectid [pk, note: 'Interne MongoDB ObjectId']
+  id varchar [unique, not null, note: 'STIX Bundle Identifier (z.B. bundle--...)']
+  type varchar [not null, default: 'bundle', note: 'Immer "bundle" für STIX 2.1 Bundles']
+  spec_version varchar [note: 'STIX Spezifikationsversion, z.B. "2.1"']
+  created timestamp [note: 'Erstellungszeitpunkt des Bundles']
+  objects json [not null, note: 'Array von STIX Domain Objects (SDOs) wie Attack-Pattern, Indicators, Malware, Relationships etc.']
+}
+
+// Logisches Schema der eingebetteten STIX-Objekte (zur Veranschaulichung):
+Table stix_embedded_object {
+  id varchar [pk, note: 'STIX Object ID (z.B. indicator--...)']
+  type varchar [not null, note: 'z.B. indicator, identity, malware, attack-pattern, relationship']
+  name varchar [note: 'Titel / Bezeichnung des Objekts']
+  description text [note: 'Beschreibung / Bedrohungsdetails']
+  pattern varchar [note: 'Suchmuster (z.B. Dateihash, IP, Domain)']
+  valid_from timestamp [note: 'Gültigkeitsbeginn']
+  source_ref varchar [note: 'Referenzquelle bei Relationships']
+  target_ref varchar [note: 'Referenzziel bei Relationships']
+}
+
+Ref: stix_embedded_object.id > stix_bundles._id
