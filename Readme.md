@@ -39,6 +39,23 @@
 
 👉 **[Vollständige Systemarchitektur & UML-Diagramme (docs/architecture.md)](docs/architecture.md)**
 
+```mermaid
+flowchart TB
+  FE["Vue 3 Frontend"] --> NGINX["Nginx / Vite Proxy"]
+  NGINX --> ID["sims-identity"]
+  NGINX --> AGGR["sims-aggregator"]
+  NGINX --> INC["sims-incidentManager"]
+  NGINX --> STIX["sims-stix-ingest"]
+
+  ID --> DB_ID[("PostgreSQL: identity")]
+  AGGR --> DB_AGGR[("PostgreSQL: aggregator")]
+  STIX --> DB_STIX[("MongoDB: stix_db")]
+
+  INC -->|Benutzer zur Benachrichtigung| ID
+  STIX -->|Incidents| AGGR
+  INC -->|Eskalations-Mails| SMTP["SMTP Server"]
+```
+
 ### Kurzüberblick Komponenten:
 
 - **`frontend`**: SPA Dashboard mit Graphenansicht
@@ -56,6 +73,99 @@ Die Datenbank-Schemata sind in einzelnen DBML-Dateien dokumentiert:
 - 📄 **[Identity DB Schema (docs/db_Identidy.dbml)](docs/db_Identidy.dbml)** — PostgreSQL: User, RefreshTokens, Levels, Categories
 - 📄 **[Aggregator DB Schema (docs/db_aggregator.dbml)](docs/db_aggregator.dbml)** — PostgreSQL: Incidents, Soft-Deletes, Relationships
 - 📄 **[STIX Ingest DB Schema (docs/db_stix.dbml)](docs/db_stix.dbml)** — MongoDB: BSON Schema für STIX 2.1 Bundles
+
+GitHub rendert DBML-Dateien nicht direkt. Die folgenden Mermaid-Diagramme zeigen deshalb die Datenmodelle direkt in dieser README; die DBML-Dateien bleiben die editierbaren Schema-Quellen.
+
+### Identity-Datenbank
+
+```mermaid
+erDiagram
+  USER ||--o{ REFRESH_TOKEN : besitzt
+  USER ||--o{ USER_LEVEL : hat
+  LEVEL ||--o{ USER_LEVEL : wird_zugewiesen
+  LEVEL ||--o{ CATEGORY : enthaelt
+
+  USER {
+    int id PK
+    varchar email UK
+    varchar password_hash
+    boolean is_deleted
+    boolean is_Admin
+    boolean is_ToNotify
+  }
+  REFRESH_TOKEN {
+    int id PK
+    varchar token
+    int user_id FK
+    timestamp expires
+    boolean is_revoked
+  }
+  LEVEL {
+    int id PK
+    varchar name UK
+  }
+  CATEGORY {
+    int id PK
+    varchar name
+    text description
+    int level_id FK
+  }
+  USER_LEVEL {
+    int user_id FK
+    int level_id FK
+  }
+```
+
+### Aggregator-Datenbank
+
+```mermaid
+erDiagram
+  INCIDENT ||--o{ RELATIONSHIP : hat
+  INCIDENT ||--o{ RELATIONSHIP : ist_Ziel_von
+
+  INCIDENT {
+    uuid id PK
+    timestamp created_at
+    timestamp db_created_at
+    boolean is_deleted
+    int deleted_by
+    varchar source_format
+    varchar type
+    varchar name
+    text desc
+  }
+  RELATIONSHIP {
+    uuid id PK
+    uuid idFrom FK
+    uuid idTo FK
+  }
+```
+
+### STIX-Ingest-Datenbank
+
+```mermaid
+erDiagram
+  STIX_BUNDLES ||--o{ STIX_EMBEDDED_OBJECT : enthaelt
+
+  STIX_BUNDLES {
+    objectid _id PK
+    varchar id UK
+    varchar type
+    varchar spec_version
+    timestamp created
+    json objects
+  }
+  STIX_EMBEDDED_OBJECT {
+    varchar id PK
+    varchar type
+    varchar name
+    text description
+    varchar pattern
+    timestamp valid_from
+    varchar source_ref
+    varchar target_ref
+  }
+```
 
 ---
 
